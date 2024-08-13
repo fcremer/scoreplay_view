@@ -1,0 +1,85 @@
+
+  
+  ion-toolbar {
+    display: flex;
+    justify-content: space-between; /* Space between left and right sections */
+    align-items: flex-start; /* Align items to the top */
+    padding: 8px 16px; /* Add padding for spacing */
+    height: 70px; /* Adjust height as needed */
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: flex-start; /* Align items to the top */
+    /* Ensuring header-left only takes up necessary width */
+  }
+  
+  .logo {
+    height: 40px; /* Set a consistent height for the logo */
+    width: auto; /* Maintain aspect ratio */
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: flex-start; /* Align items to the top */
+    justify-content: flex-end; /* Align items to the right */
+    /* Ensuring header-right only takes up necessary width */
+  }
+  
+  .clock {
+    font-size: 1.75em; /* Match the height of the circle */
+    font-weight: bold;
+    color: var(--ion-color-primary); // Use Ionic's primary color
+    margin-right: 16px;
+    line-height: 40px; /* Match the circle height for consistent vertical alignment */
+  }
+  
+  .progress-circle {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .circle-bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 2.8;
+  }
+  
+  .circle {
+    fill: none;
+    stroke: var(--ion-color-primary); // Primary color for the outline
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s linear;
+  }
+  
+  .timer-text {
+    fill: var(--ion-color-primary);
+    font-size: 8px;
+    font-weight: bold;
+    text-anchor: middle;
+    alignment-baseline: middle;
+  }
+  
+  .widget-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+    min-height: calc(100vh - 120px); // Adjust based on header height
+  }
+  
+  .widget {
+    width: 30%;
+    background-color: #f4f4f4;
+    margin: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  
+    h2 {
+      color: var(--ion-color-primary);
+      margin-bottom: 10px;
+    }
+  }

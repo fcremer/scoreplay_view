@@ -232,3 +232,34 @@
   color: var(--text-color); /* Use text color for readability */
   text-align: center;
 }
+
+ion-select {
+  width: 140px; /* Adjust width to fit more comfortably */
+  --padding-start: 10px; /* Ensure proper padding */
+  --padding-end: 10px; /* Ensure proper padding */
+}
+.player-selection {
+  display: flex;
+  justify-content: center; /* Center dropdowns and button horizontally */
+  margin-bottom: 10px; /* Space below the dropdowns */
+}
+
+.dropdown-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping if necessary */
+  gap: 10px; /* Space between dropdowns and button */
+  align-items: center; /* Align items vertically in the center */
+}
+
+ion-button {
+  --padding-start: 0; /* Remove start padding */
+  --padding-end: 0;   /* Remove end padding */
+  --inner-padding-end: 0; /* Remove inner end padding */
+  --inner-padding-start: 0; /* Remove inner start padding */
+  --inner-padding-top: 0; /* Remove inner top padding */
+  --inner-padding-bottom: 0; /* Remove inner bottom padding */
+}
+ion-icon {
+  font-size: 1.5em; /* Adjust icon size as needed */
+  color: var(--ion-color-primary); /* Use the primary color for the icon */
+}

@@ -109,12 +109,56 @@
     </div>
 
     <div class="widget match-suggestor-widget">
-      <h2 class="widget-heading"><ion-icon name="color-wand-outline"></ion-icon> Match-Suggester</h2>
-      <div class="info-text">
-        <ion-icon name="information-circle-outline"></ion-icon>
-        To sign in, please submit a manual game score
+      <h2 class="widget-heading">
+        <ion-icon name="color-wand-outline"></ion-icon> Match-Suggester
+      </h2>
+
+      <div class="player-selection">
+        <div class="dropdown-container">
+          <ion-select
+            placeholder="Select Player 1"
+            [(ngModel)]="selectedPlayer1"
+            (ionChange)="checkMatch()"
+          >
+            <ion-select-option
+              *ngFor="let player of playerList"
+              [value]="player.abbreviation"
+            >
+              {{ player.name }}
+            </ion-select-option>
+          </ion-select>
+    
+          <ion-select
+            placeholder="Select Player 2"
+            [(ngModel)]="selectedPlayer2"
+            (ionChange)="checkMatch()"
+          >
+            <ion-select-option
+              *ngFor="let player of playerList"
+              [value]="player.abbreviation"
+            >
+              {{ player.name }}
+            </ion-select-option>
+          </ion-select>
+    
+          <!-- Reset button with icon -->
+          <ion-button (click)="resetSelections()" fill="clear">
+            <ion-icon name="refresh-circle-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
       </div>
       <div class="match-suggestor-container">
+        <!-- Display message if no players are selected -->
+        <div *ngIf="!selectedPlayer1 || !selectedPlayer2" class="no-selection">
+          <ion-icon name="arrow-up-outline" style="color: gray; font-size: 2em;"></ion-icon>
+          <p style="color: gray;">Please choose player</p>
+        </div>
+        <!-- Display sad smiley if there are no matches -->
+        <div *ngIf="selectedPlayer1 && selectedPlayer2 && matchSuggestions.length === 0" class="no-matches">
+          <ion-icon name="sad-outline" style="color: gray; font-size: 2em;"></ion-icon>
+          <p style="color: gray;">No matches</p>
+        </div>
+        <!-- Match suggestions -->
         <div *ngFor="let suggestion of matchSuggestions" class="pinball-group">
           <div class="pinball-row">
             <div class="pinball-name">
@@ -134,7 +178,9 @@
           </div>
         </div>
         <div class="free-scores">
-          <h2 class="widget-heading"><ion-icon name="bar-chart-outline"></ion-icon> Point-Suggestor</h2>
+          <h2 class="widget-heading">
+            <ion-icon name="bar-chart-outline"></ion-icon> Point-Suggestor
+          </h2>
           <ul>
             <div class="info-text">
               <ion-icon name="information-circle-outline"></ion-icon>
@@ -145,5 +191,3 @@
         </div>
       </div>
     </div>
-  </div>
-</ion-content>

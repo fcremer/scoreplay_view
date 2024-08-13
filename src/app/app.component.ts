@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+// Interfaces for defining data structures
 interface TableData {
   heading: string;
   data: { rank: number; player: string; score: number }[];
@@ -45,43 +46,36 @@ interface PinballMap {
   [key: string]: string; // Index signature for pinball mapping
 }
 
-interface MatchSuggestion {
-  pinball: string;
-  player1: string;
-  player2: string;
-}
-
-interface GroupedMatchSuggestions {
-  pinballName: string;
-  matches: { player1: string; player2: string }[];
-}
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  // Existing variables...
+  // Component state variables
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
-  latestScores: LatestScore[] = []; // Store the latest scores
-  highScores: HighScore[] = []; // Store the total high scores
-  matchSuggestions: GroupedMatchSuggestions[] = []; // Store match suggestions grouped by pinball
-  players: PlayerMap = {}; // Map player abbreviations to names
-  pinballs: PinballMap = {}; // Map pinball abbreviations to long names
-  standings: TableData[] = []; // Store standings data
-  refreshTime: number = 60; // Refresh every 60 seconds
+  latestScores: LatestScore[] = [];
+  highScores: HighScore[] = [];
+  players: PlayerMap = {};
+  pinballs: PinballMap = {};
+  standings: TableData[] = [];
+  refreshTime: number = 60;
   currentHourMinute: string = '';
-  progress: number = 100; // Percentage progress of the circle
+  progress: number = 100;
   searchQuery: string = '';
   isSearching: boolean = false;
   tables: TableData[] = [];
   filteredTables: TableData[] = [];
   scrollInterval: any;
-  isLoading: boolean = true; // Loading state
-  freeScoreMachines: string[] = []; // List to store free score machine full names
+  isLoading: boolean = true;
+  freeScoreMachines: string[] = [];
+  playerList: Player[] = [];
+  selectedPlayer1: string = '';
+  selectedPlayer2: string = '';
+  commonUnplayedPinballs: string[] = []; // List to store common unplayed pinballs
+  matchSuggestions: { pinballName: string; matches: { player1: string; player2: string }[] }[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -92,47 +86,45 @@ export class AppComponent implements OnInit {
     this.fetchData();
     this.updateTime();
     this.startCountdown();
-    this.loadAllData(); // Load all data and wait until it's ready
-    this.fetchFreeScores(); // Fetch the free score machines
+    this.loadAllData();
+    this.fetchFreeScores();
+    this.fetchPlayers();
+    this.fetchPinballs();
   }
 
-  
   initializeTables() {
     this.standings = []; // Clear previous standings
   }
 
   loadAllData() {
-    // Load players and pinballs first
     Promise.all([this.fetchPlayers(), this.fetchPinballs()])
       .then(() => {
-        // Then fetch standings and match suggestions once players and pinballs are loaded
-        return Promise.all([this.fetchStandings(), this.fetchMatchSuggestions()]);
+        return this.fetchStandings();
       })
       .then(() => {
-        this.fetchLatestScores(); // Ensure latest scores are fetched
-        this.fetchHighScores(); // Ensure high scores are fetched
+        this.fetchLatestScores();
+        this.fetchHighScores();
       })
       .then(() => {
         console.log('All data loaded successfully');
-        this.isLoading = false; // Set loading to false once all data is fetched
+        this.isLoading = false;
       })
       .catch(error => {
         console.error('Failed to load data:', error);
-        this.isLoading = false; // Ensure loading is false even on error
+        this.isLoading = false;
       });
   }
 
   fetchData() {
-    // Simulate fetching data
     this.weatherData = 'Sunny, 25°C';
     this.newsData = 'Breaking News: Ionic Framework is awesome!';
     this.stockData = 'AAPL: $150.25';
   }
+
   fetchLatestScores() {
     this.http.get<LatestScore[]>('https://liga.aixtraball.de/latestscores')
       .subscribe(scores => {
         if (scores) {
-          // Sort scores by points in descending order
           this.latestScores = scores.sort((a, b) => b.points - a.points);
           console.log('Latest scores loaded:', this.latestScores);
         }
@@ -145,7 +137,6 @@ export class AppComponent implements OnInit {
     this.http.get<HighScore[]>('https://liga.aixtraball.de/total_highscore')
       .subscribe(highScores => {
         if (highScores) {
-          // Sort high scores by rank in descending order
           this.highScores = highScores.sort((a, b) => a.rank - b.rank);
           console.log('High scores loaded:', this.highScores);
         }
@@ -153,6 +144,7 @@ export class AppComponent implements OnInit {
         console.error('Failed to fetch high scores', error);
       });
   }
+
   fetchPlayers(): Promise<void> {
     return this.http.get<Player[]>('https://liga.aixtraball.de/players')
       .toPromise()
@@ -162,6 +154,7 @@ export class AppComponent implements OnInit {
             acc[player.abbreviation] = player.name;
             return acc;
           }, {});
+          this.playerList = players;
           console.log('Players loaded:', this.players);
         }
       }, error => {
@@ -193,7 +186,7 @@ export class AppComponent implements OnInit {
         .then(scores => {
           if (scores) {
             const standingsData = scores.map((score, index) => ({
-              rank: index + 1, // Rank based on order in array
+              rank: index + 1,
               player: this.formatPlayerName(this.players[score.player] || score.player),
               score: score.score
             }));
@@ -208,31 +201,45 @@ export class AppComponent implements OnInit {
         });
     });
     return Promise.all(promises).then(() => {
-      this.filteredTables = this.standings; // Ensure filtered tables are up-to-date
+      this.filteredTables = this.standings;
     });
   }
-  fetchMatchSuggestions() {
-    this.http.get<any[]>('https://liga.aixtraball.de/matchsuggestion')
-      .subscribe(suggestions => {
-        if (suggestions) {
-          this.matchSuggestions = suggestions.slice(0, 13).map(suggestion => ({
-            pinballName: this.pinballs[suggestion.pinball] || suggestion.pinball,
-            matches: [
-              {
-                player1: this.players[suggestion.player1] || suggestion.player1,
-                player2: this.players[suggestion.player2] || suggestion.player2
-              }
-            ]
+
+  checkMatch() {
+    if (this.selectedPlayer1 && this.selectedPlayer2) {
+      const endpoint = `https://liga.aixtraball.de/matchsuggestion/${this.selectedPlayer1}/${this.selectedPlayer2}`;
+      this.http.get<{ common_unplayed_machines: string[] }>(endpoint)
+        .subscribe(response => {
+          console.log('Match suggestion response:', response);
+          // Update the list of common unplayed pinballs
+          this.commonUnplayedPinballs = response.common_unplayed_machines.map(pinballAbbr => 
+            this.pinballs[pinballAbbr] || pinballAbbr
+          );
+          this.matchSuggestions = response.common_unplayed_machines.map(pinballAbbr => ({
+            pinballName: this.pinballs[pinballAbbr] || pinballAbbr,
+            matches: [{ player1: this.players[this.selectedPlayer1], player2: this.players[this.selectedPlayer2] }]
           }));
-          console.log('Match suggestions loaded:', this.matchSuggestions);
+          console.log('Common unplayed pinballs:', this.commonUnplayedPinballs);
+        }, error => {
+          console.error('Failed to fetch match suggestions', error);
+        });
+    }
+  }
+
+  fetchFreeScores() {
+    this.http.get<string[]>('https://liga.aixtraball.de/getfreescores')
+      .subscribe(abbreviations => {
+        if (abbreviations) {
+          this.freeScoreMachines = abbreviations.map(abbreviation => this.pinballs[abbreviation] || abbreviation);
+          console.log('Free score machines loaded:', this.freeScoreMachines);
         }
       }, error => {
-        console.error('Failed to fetch match suggestions', error);
+        console.error('Failed to fetch free scores', error);
       });
   }
 
   formatNumberWithSeparators(value: number): string {
-    return value.toLocaleString('en-US').replace(/,/g, '.'); // Convert commas to dots for thousand separators
+    return value.toLocaleString('en-US').replace(/,/g, '.');
   }
 
   formatPlayerName(name: string): string {
@@ -301,16 +308,10 @@ export class AppComponent implements OnInit {
       }
     }, 1000); // Update every second
   }
-
-  fetchFreeScores() {
-    this.http.get<string[]>('https://liga.aixtraball.de/getfreescores')
-      .subscribe(abbreviations => {
-        if (abbreviations) {
-          this.freeScoreMachines = abbreviations.map(abbreviation => this.pinballs[abbreviation] || abbreviation);
-          console.log('Free score machines loaded:', this.freeScoreMachines);
-        }
-      }, error => {
-        console.error('Failed to fetch free scores', error);
-      });
+  resetSelections() {
+    this.selectedPlayer1 = '';
+    this.selectedPlayer2 = '';
+    this.matchSuggestions = [];
   }
 }
+

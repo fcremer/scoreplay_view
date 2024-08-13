@@ -1,0 +1,7 @@
+{
+  "name": "scoreplay_view",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

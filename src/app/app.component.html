@@ -152,8 +152,8 @@
       <div class="match-suggestor-container">
         <!-- Display message if no players are selected -->
         <div *ngIf="!selectedPlayer1 || !selectedPlayer2" class="no-selection">
-          <ion-icon name="arrow-up-outline" style="color: gray; font-size: 2em;"></ion-icon>
-          <p style="color: gray;">Please choose player</p>
+          <ion-icon name="arrow-up-outline"></ion-icon>
+          <p>Please choose player</p>
         </div>
         <!-- Display sad smiley if there are no matches -->
         <div *ngIf="selectedPlayer1 && selectedPlayer2 && matchSuggestions.length === 0" class="no-matches">
@@ -170,12 +170,12 @@
         </div>
         <div class="free-scores">
           <h2 class="widget-heading">
-            <ion-icon name="bar-chart-outline"></ion-icon> Point-Suggester
+            <ion-icon name="bar-chart-outline"></ion-icon> Freebies
           </h2>
           <ul>
             <div class="info-text">
               <ion-icon name="information-circle-outline"></ion-icon>
-              Each game will score (less scores then points)
+              Fewer scores submitted than points available.
             </div>
             <li *ngFor="let machine of freeScoreMachines">{{ machine }}</li>
           </ul>

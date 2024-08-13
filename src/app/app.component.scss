@@ -67,7 +67,7 @@
   .widget {
     width: 22%; /* Adjust width to fit four widgets per row */
     height: 100%; /* Make each widget take full height of the container */
-    background-color: #f4f4f4;
+    background-color: var(--ion-background-color, #f4f4f4); /* Default light mode color */
     margin: 10px;
     border-radius: 8px;
     text-align: center;
@@ -76,6 +76,7 @@
     overflow: hidden; /* Ensure overflow is hidden */
     display: flex;
     flex-direction: column;
+    color: var(--ion-text-color, #000); /* Default text color */
   }
   
   
@@ -262,4 +263,25 @@ ion-button {
 ion-icon {
   font-size: 1.5em; /* Adjust icon size as needed */
   color: var(--ion-color-primary); /* Use the primary color for the icon */
+}
+
+@media (prefers-color-scheme: dark) {
+  .widget {
+    background-color: #1F1F1F; /* Dark mode background color */
+    color: #fff; /* Text color for dark mode */
+  }
+
+  .ranking-table th,
+  .ranking-table td {
+    color: #fff; /* Text color for table headings and cells */
+  }
+
+  .info-text {
+    color: #fff; /* Text color for info text */
+  }
+
+  .no-selection,
+  .no-matches {
+    color: gray; /* Text color for no selection/matches */
+  }
 }

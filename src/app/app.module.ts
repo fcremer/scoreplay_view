@@ -10,7 +10,9 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(),
+    IonicModule.forRoot({
+      mode: 'ios', // Set the default mode to iOS
+    }),
     FormsModule,
     HttpClientModule, // Add HttpClientModule here
   ],

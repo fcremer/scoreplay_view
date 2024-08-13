@@ -7,23 +7,33 @@
     padding: 8px 16px; /* Add padding for spacing */
     height: 70px; /* Adjust height as needed */
   }
-  
+
   .header-right {
     display: flex;
     align-items: center; /* Vertically center items */
+    justify-content: flex-end; /* Align items to the right */
+    width: 100%;
+    padding-right: 16px; /* Optional: Add right padding for spacing from edge */
   }
   
   .clock {
-    font-size: 1.75em; /* Match the height of the circle */
+    font-size: 1.75em;
     font-weight: bold;
-    color: var(--ion-color-primary); // Use Ionic's primary color
-    margin-right: 16px;
-    line-height: 40px; /* Match the circle height for consistent vertical alignment */
+    color: var(--ion-color-primary);
+    margin-right: 24px; /* Increase margin to create more space */
+    line-height: 40px;
   }
   
   .progress-circle {
     width: 40px;
     height: 40px;
+    margin-right: 24px; /* Increase margin to create more space between countdown and logo */
+  }
+  .header-logo {
+    width: auto; /* Set a wider width for the logo */
+    height: auto; /* Maintain aspect ratio */
+    margin-left: 8px; /* Adjust margin to create space between countdown and logo */
+    object-fit: contain; /* Ensure the image scales nicely */
   }
   
   .circle-bg {
@@ -105,13 +115,9 @@
   .ranking-table {
     width: 100%;
     margin-bottom: 20px;
+    margin: 0 auto; /* Center the table horizontally within the container */
     border-collapse: collapse;
-  }
-  
-  .ranking-table td {
-    padding: 8px;
-    text-align: left;
-    border: none; /* Remove table lines */
+    text-align: center; /* Center-align text for entire table */
   }
   
   .ranking-table th {
@@ -119,12 +125,31 @@
     color: var(--ion-color-primary); /* Primary color for table headings */
     font-weight: bold;
     font-size: 1em;
+    text-align: center; /* Ensure header text is centered */
+  }
+  
+  .ranking-table td {
+    text-align: center; /* Center-align text in table cells */
+    padding: 8px; /* Add padding for better spacing */
+    vertical-align: middle; /* Vertically center content */
+  }
+  
+  /* Dark mode adjustments for table */
+  body.dark .ranking-table th,
+  body.dark .ranking-table td {
+    color: #fff; /* Text color for dark mode */
+  }
+  
+  body.dark .ranking-table td {
+    border-color: #333; /* Darker border color in dark mode */
   }
   .info-text {
     font-size: 0.9em;
     color: var(--text-color); // Matches the text color theme
     margin-bottom: 10px;
     text-align: center;
+    padding: 20px; /* Add padding for better spacing */
+
   }
   .match-suggestor-container {
     display: flex;
@@ -136,7 +161,6 @@
   }
   
   .pinball-row {
-    display: flex;
     width: 100%;
     align-items: flex-start; /* Align items at the start of the flex container */
     justify-content: space-between; /* Distribute space between and around content items */
@@ -157,19 +181,15 @@
     font-size: 1em;
   }
   .pinball-name {
-    width: 50%; /* Width for the pinball name column */
+    width: 100%; /* Width for the pinball name column */
     text-align: left; /* Align text to the left */
-    padding-right: 10px; /* Space between pinball name and suggestions */
-    color: var(--heading-color); /* Use primary color for pinball names */
-    font-weight: bold;
+    padding: 10px;
   }
   
   .suggestion-list {
     width: 70%; /* Width for the suggestion list column */
     text-align: left; /* Align text to the left */
   }
-  
-
   
   .info-text {
     display: flex;
@@ -200,16 +220,6 @@
       margin-right: 5px;
     }
 }
-.ranking-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0; /* Remove margin between tables */
-  }
-  .ranking-table td {
-    padding: 4px; /* Reduce padding for a more compact table */
-    border: none; /* Remove border lines */
-    text-align: left; /* Align text to the left */
-  }
 
   .free-scores {
   margin-top: 20px;

@@ -125,3 +125,52 @@
     margin-bottom: 10px;
     text-align: center;
   }
+  .match-suggestor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the matches vertically */
+    justify-content: top;
+    flex-grow: 1; /* Allow the container to take up available space proportionally */
+    overflow: auto; /* Allow scrolling if content overflows */
+  }
+  
+  .pinball-group {
+    margin-bottom: 1px; /* Reduce space between pinball groups */
+  }
+  
+  .pinball-group h3 {
+    background-color: transparent; /* Remove default heading background */
+    color: var(--ion-color-primary); /* Primary color for table headings */
+    font-weight: bold;
+    font-size: 1em;/* Center align pinball group headings */
+  }
+  
+  .info-text {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: var(--text-color); // Matches the text color theme
+    margin-bottom: 10px;
+    text-align: center;
+  
+    ion-icon {
+      font-size: 1.1em;
+      color: grey;
+      margin-right: 5px;
+    }
+}
+.info-text {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center align the text and icon horizontally */
+    font-size: 0.9em;
+    color: var(--text-color); // Matches the text color theme
+    margin-bottom: 10px;
+    text-align: center;
+  
+    ion-icon {
+      font-size: 1.1em;
+      color: grey;
+      margin-right: 5px;
+    }
+}

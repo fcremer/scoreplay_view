@@ -51,6 +51,11 @@ interface MatchSuggestion {
   player2: string;
 }
 
+interface GroupedMatchSuggestions {
+  pinballName: string;
+  matches: { player1: string; player2: string }[];
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -62,7 +67,7 @@ export class AppComponent implements OnInit {
   stockData: string = 'Loading stocks...';
   latestScores: LatestScore[] = []; // Store the latest scores
   highScores: HighScore[] = []; // Store the total high scores
-  matchSuggestions: MatchSuggestion[] = []; // Store match suggestions
+  matchSuggestions: GroupedMatchSuggestions[] = []; // Store match suggestions grouped by pinball
   players: PlayerMap = {}; // Map player abbreviations to names
   pinballs: PinballMap = {}; // Map pinball abbreviations to long names
   standings: TableData[] = []; // Store standings data
@@ -208,7 +213,20 @@ export class AppComponent implements OnInit {
       .toPromise()
       .then(suggestions => {
         if (suggestions) {
-          this.matchSuggestions = suggestions;
+          // Group matches by pinball
+          const grouped = suggestions.reduce((acc: Record<string, GroupedMatchSuggestions>, suggestion) => {
+            const pinballName = this.pinballs[suggestion.pinball] || suggestion.pinball;
+            if (!acc[pinballName]) {
+              acc[pinballName] = { pinballName, matches: [] };
+            }
+            acc[pinballName].matches.push({
+              player1: this.formatPlayerName(this.players[suggestion.player1] || suggestion.player1),
+              player2: this.formatPlayerName(this.players[suggestion.player2] || suggestion.player2),
+            });
+            return acc;
+          }, {});
+
+          this.matchSuggestions = Object.values(grouped);
           console.log('Match suggestions loaded:', this.matchSuggestions);
         }
       }, error => {

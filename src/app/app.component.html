@@ -114,23 +114,20 @@
         <ion-icon name="information-circle-outline"></ion-icon>
         To sign in, please submit a manual game score
       </div>
-      <table class="ranking-table">
-        <thead>
-          <tr>
-            <th>Pinball</th>
-            <th>Match</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let suggestion of matchSuggestions">
-            <td>{{ pinballs[suggestion.pinball] || suggestion.pinball }}</td>
-            <td>
-              {{ formatPlayerName(players[suggestion.player1] || suggestion.player1) }} /
-              {{ formatPlayerName(players[suggestion.player2] || suggestion.player2) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="match-suggestor-container">
+        <div *ngFor="let suggestion of matchSuggestions" class="pinball-group">
+          <h3>{{ suggestion.pinballName }}</h3>
+          <table class="ranking-table">
+            <tbody>
+              <tr *ngFor="let match of suggestion.matches">
+                <td>
+                  {{ match.player1 }} / {{ match.player2 }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </ion-content>

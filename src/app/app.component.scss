@@ -134,16 +134,41 @@
     overflow: auto; /* Allow scrolling if content overflows */
   }
   
-  .pinball-group {
-    margin-bottom: 1px; /* Reduce space between pinball groups */
+  .pinball-row {
+    display: flex;
+    width: 100%;
+    align-items: flex-start; /* Align items at the start of the flex container */
+    justify-content: space-between; /* Distribute space between and around content items */
+    margin-bottom: 10px; /* Space between each pinball-row */
   }
   
+  .pinball-group {
+    width: 80%;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px; /* Reduce space between pinball groups */
+  }
   .pinball-group h3 {
+    margin: 5px 0; /* Reduce margin for pinball group headings */
     background-color: transparent; /* Remove default heading background */
     color: var(--ion-color-primary); /* Primary color for table headings */
     font-weight: bold;
-    font-size: 1em;/* Center align pinball group headings */
+    font-size: 1em;
   }
+  .pinball-name {
+    width: 50%; /* Width for the pinball name column */
+    text-align: left; /* Align text to the left */
+    padding-right: 10px; /* Space between pinball name and suggestions */
+    color: var(--heading-color); /* Use primary color for pinball names */
+    font-weight: bold;
+  }
+  
+  .suggestion-list {
+    width: 70%; /* Width for the suggestion list column */
+    text-align: left; /* Align text to the left */
+  }
+  
+
   
   .info-text {
     display: flex;
@@ -174,3 +199,13 @@
       margin-right: 5px;
     }
 }
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0; /* Remove margin between tables */
+  }
+  .ranking-table td {
+    padding: 4px; /* Reduce padding for a more compact table */
+    border: none; /* Remove border lines */
+    text-align: left; /* Align text to the left */
+  }

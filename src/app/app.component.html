@@ -29,7 +29,7 @@
 
   <div *ngIf="!isLoading" class="widget-container">
     <div class="widget">
-      <h2 class="widget-heading">Standings</h2>
+      <h2 class="widget-heading"><ion-icon name="trophy-outline"></ion-icon> Standings</h2>
       <ion-searchbar
         [(ngModel)]="searchQuery"
         placeholder="Search by table heading"
@@ -61,7 +61,7 @@
     </div>
 
     <div class="widget">
-      <h2 class="widget-heading">Season</h2>
+      <h2 class="widget-heading"><ion-icon name="calendar-outline"></ion-icon> Season</h2>
       <table class="ranking-table">
         <thead>
           <tr>
@@ -81,7 +81,7 @@
     </div>
 
     <div class="widget">
-      <h2 class="widget-heading">Latest Scores</h2>
+      <h2 class="widget-heading"><ion-icon name="time-outline"></ion-icon> Latest Scores</h2>
       <table class="ranking-table">
         <thead>
           <tr>
@@ -108,8 +108,8 @@
       </table>
     </div>
 
-    <div class="widget">
-      <h2 class="widget-heading">Match-Suggestor (Beta)</h2>
+    <div class="widget match-suggestor-widget">
+      <h2 class="widget-heading"><ion-icon name="color-wand-outline"></ion-icon> Match-Suggester</h2>
       <div class="info-text">
         <ion-icon name="information-circle-outline"></ion-icon>
         To sign in, please submit a manual game score
@@ -132,6 +132,16 @@
               </table>
             </div>
           </div>
+        </div>
+        <div class="free-scores">
+          <h2 class="widget-heading"><ion-icon name="bar-chart-outline"></ion-icon> Point-Suggestor</h2>
+          <ul>
+            <div class="info-text">
+              <ion-icon name="information-circle-outline"></ion-icon>
+              Each game will score (less scores then points)
+            </div>
+            <li *ngFor="let machine of freeScoreMachines">{{ machine }}</li>
+          </ul>
         </div>
       </div>
     </div>

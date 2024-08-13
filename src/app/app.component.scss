@@ -129,9 +129,9 @@
     display: flex;
     flex-direction: column;
     align-items: center; /* Center align the matches vertically */
-    justify-content: top;
-    flex-grow: 1; /* Allow the container to take up available space proportionally */
-    overflow: auto; /* Allow scrolling if content overflows */
+    justify-content: flex-start; /* Align to top of container */
+    flex-grow: 1;
+    overflow: auto;
   }
   
   .pinball-row {
@@ -139,7 +139,7 @@
     width: 100%;
     align-items: flex-start; /* Align items at the start of the flex container */
     justify-content: space-between; /* Distribute space between and around content items */
-    margin-bottom: 10px; /* Space between each pinball-row */
+    margin-bottom: 0; /* Space between each pinball-row */
   }
   
   .pinball-group {
@@ -209,3 +209,26 @@
     border: none; /* Remove border lines */
     text-align: left; /* Align text to the left */
   }
+
+  .free-scores {
+  margin-top: 20px;
+  text-align: left; /* Align list to the left */
+}
+
+.free-scores h3 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: var(--heading-color); /* Use heading color for consistency */
+}
+
+.free-scores ul {
+  list-style-type: none; /* Remove bullet points */
+  margin: 0;
+  padding: 0 20px;
+}
+
+.free-scores li {
+  margin-bottom: 5px;
+  color: var(--text-color); /* Use text color for readability */
+  text-align: center;
+}

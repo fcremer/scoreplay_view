@@ -62,6 +62,7 @@ interface GroupedMatchSuggestions {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
+  // Existing variables...
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
@@ -74,14 +75,13 @@ export class AppComponent implements OnInit {
   refreshTime: number = 60; // Refresh every 60 seconds
   currentHourMinute: string = '';
   progress: number = 100; // Percentage progress of the circle
-
   searchQuery: string = '';
   isSearching: boolean = false;
   tables: TableData[] = [];
   filteredTables: TableData[] = [];
   scrollInterval: any;
-
   isLoading: boolean = true; // Loading state
+  freeScoreMachines: string[] = []; // List to store free score machine full names
 
   constructor(private http: HttpClient) {}
 
@@ -93,7 +93,10 @@ export class AppComponent implements OnInit {
     this.updateTime();
     this.startCountdown();
     this.loadAllData(); // Load all data and wait until it's ready
+    this.fetchFreeScores(); // Fetch the free score machines
   }
+
+  
   initializeTables() {
     this.standings = []; // Clear previous standings
   }
@@ -208,25 +211,19 @@ export class AppComponent implements OnInit {
       this.filteredTables = this.standings; // Ensure filtered tables are up-to-date
     });
   }
-  fetchMatchSuggestions(): Promise<void> {
-    return this.http.get<MatchSuggestion[]>('https://liga.aixtraball.de/matchsuggestion')
-      .toPromise()
-      .then(suggestions => {
+  fetchMatchSuggestions() {
+    this.http.get<any[]>('https://liga.aixtraball.de/matchsuggestion')
+      .subscribe(suggestions => {
         if (suggestions) {
-          // Group matches by pinball
-          const grouped = suggestions.reduce((acc: Record<string, GroupedMatchSuggestions>, suggestion) => {
-            const pinballName = this.pinballs[suggestion.pinball] || suggestion.pinball;
-            if (!acc[pinballName]) {
-              acc[pinballName] = { pinballName, matches: [] };
-            }
-            acc[pinballName].matches.push({
-              player1: this.formatPlayerName(this.players[suggestion.player1] || suggestion.player1),
-              player2: this.formatPlayerName(this.players[suggestion.player2] || suggestion.player2),
-            });
-            return acc;
-          }, {});
-
-          this.matchSuggestions = Object.values(grouped);
+          this.matchSuggestions = suggestions.slice(0, 13).map(suggestion => ({
+            pinballName: this.pinballs[suggestion.pinball] || suggestion.pinball,
+            matches: [
+              {
+                player1: this.players[suggestion.player1] || suggestion.player1,
+                player2: this.players[suggestion.player2] || suggestion.player2
+              }
+            ]
+          }));
           console.log('Match suggestions loaded:', this.matchSuggestions);
         }
       }, error => {
@@ -303,5 +300,17 @@ export class AppComponent implements OnInit {
         this.loadAllData(); // Reload all data
       }
     }, 1000); // Update every second
+  }
+
+  fetchFreeScores() {
+    this.http.get<string[]>('https://liga.aixtraball.de/getfreescores')
+      .subscribe(abbreviations => {
+        if (abbreviations) {
+          this.freeScoreMachines = abbreviations.map(abbreviation => this.pinballs[abbreviation] || abbreviation);
+          console.log('Free score machines loaded:', this.freeScoreMachines);
+        }
+      }, error => {
+        console.error('Failed to fetch free scores', error);
+      });
   }
 }

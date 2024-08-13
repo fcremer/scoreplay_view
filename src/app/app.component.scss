@@ -119,3 +119,9 @@
     font-weight: bold;
     font-size: 1em;
   }
+  .info-text {
+    font-size: 0.9em;
+    color: var(--text-color); // Matches the text color theme
+    margin-bottom: 10px;
+    text-align: center;
+  }

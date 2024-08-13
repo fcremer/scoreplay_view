@@ -45,6 +45,12 @@ interface PinballMap {
   [key: string]: string; // Index signature for pinball mapping
 }
 
+interface MatchSuggestion {
+  pinball: string;
+  player1: string;
+  player2: string;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -56,6 +62,7 @@ export class AppComponent implements OnInit {
   stockData: string = 'Loading stocks...';
   latestScores: LatestScore[] = []; // Store the latest scores
   highScores: HighScore[] = []; // Store the total high scores
+  matchSuggestions: MatchSuggestion[] = []; // Store match suggestions
   players: PlayerMap = {}; // Map player abbreviations to names
   pinballs: PinballMap = {}; // Map pinball abbreviations to long names
   standings: TableData[] = []; // Store standings data
@@ -90,8 +97,8 @@ export class AppComponent implements OnInit {
     // Load players and pinballs first
     Promise.all([this.fetchPlayers(), this.fetchPinballs()])
       .then(() => {
-        // Then fetch standings once players and pinballs are loaded
-        return this.fetchStandings();
+        // Then fetch standings and match suggestions once players and pinballs are loaded
+        return Promise.all([this.fetchStandings(), this.fetchMatchSuggestions()]);
       })
       .then(() => {
         this.fetchLatestScores(); // Ensure latest scores are fetched
@@ -113,7 +120,6 @@ export class AppComponent implements OnInit {
     this.newsData = 'Breaking News: Ionic Framework is awesome!';
     this.stockData = 'AAPL: $150.25';
   }
-
   fetchLatestScores() {
     this.http.get<LatestScore[]>('https://liga.aixtraball.de/latestscores')
       .subscribe(scores => {
@@ -139,7 +145,6 @@ export class AppComponent implements OnInit {
         console.error('Failed to fetch high scores', error);
       });
   }
-
   fetchPlayers(): Promise<void> {
     return this.http.get<Player[]>('https://liga.aixtraball.de/players')
       .toPromise()
@@ -198,6 +203,18 @@ export class AppComponent implements OnInit {
       this.filteredTables = this.standings; // Ensure filtered tables are up-to-date
     });
   }
+  fetchMatchSuggestions(): Promise<void> {
+    return this.http.get<MatchSuggestion[]>('https://liga.aixtraball.de/matchsuggestion')
+      .toPromise()
+      .then(suggestions => {
+        if (suggestions) {
+          this.matchSuggestions = suggestions;
+          console.log('Match suggestions loaded:', this.matchSuggestions);
+        }
+      }, error => {
+        console.error('Failed to fetch match suggestions', error);
+      });
+  }
 
   formatNumberWithSeparators(value: number): string {
     return value.toLocaleString('en-US').replace(/,/g, '.'); // Convert commas to dots for thousand separators
@@ -210,7 +227,6 @@ export class AppComponent implements OnInit {
     }
     return name;
   }
-
   startAutoScroll() {
     this.scrollInterval = setInterval(() => {
       if (!this.isSearching) {

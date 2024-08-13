@@ -59,6 +59,7 @@
         </ng-container>
       </div>
     </div>
+
     <div class="widget">
       <h2 class="widget-heading">Season</h2>
       <table class="ranking-table">
@@ -76,8 +77,9 @@
             <td>{{ formatNumberWithSeparators(score.total_points) }}</td>
           </tr>
         </tbody>
-      </table>    
+      </table>
     </div>
+
     <div class="widget">
       <h2 class="widget-heading">Latest Scores</h2>
       <table class="ranking-table">
@@ -105,9 +107,30 @@
         </tbody>
       </table>
     </div>
+
     <div class="widget">
       <h2 class="widget-heading">Match-Suggestor (Beta)</h2>
-      <p>This is the fourth widget.</p>
+      <div class="info-text">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        To sign in, please submit a manual game score
+      </div>
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>Pinball</th>
+            <th>Match</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let suggestion of matchSuggestions">
+            <td>{{ pinballs[suggestion.pinball] || suggestion.pinball }}</td>
+            <td>
+              {{ formatPlayerName(players[suggestion.player1] || suggestion.player1) }} /
+              {{ formatPlayerName(players[suggestion.player2] || suggestion.player2) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </ion-content>

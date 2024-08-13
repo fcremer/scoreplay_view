@@ -14,6 +14,12 @@ interface LatestScore {
   rank: number | null; // Rank can be null
 }
 
+interface PinballHighScore {
+  player: string;
+  points: number; // Represents the rank as points
+  score: number;  // Represents the score
+}
+
 interface HighScore {
   player: string;
   rank: number;
@@ -52,6 +58,7 @@ export class AppComponent implements OnInit {
   highScores: HighScore[] = []; // Store the total high scores
   players: PlayerMap = {}; // Map player abbreviations to names
   pinballs: PinballMap = {}; // Map pinball abbreviations to long names
+  standings: TableData[] = []; // Store standings data
   refreshTime: number = 60; // Refresh every 60 seconds
   currentHourMinute: string = '';
   progress: number = 100; // Percentage progress of the circle
@@ -62,6 +69,8 @@ export class AppComponent implements OnInit {
   filteredTables: TableData[] = [];
   scrollInterval: any;
 
+  isLoading: boolean = true; // Loading state
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
@@ -71,23 +80,31 @@ export class AppComponent implements OnInit {
     this.fetchData();
     this.updateTime();
     this.startCountdown();
-    this.fetchLatestScores(); // Fetch latest scores on initialization
-    this.fetchPlayers(); // Fetch player data
-    this.fetchPinballs(); // Fetch pinball data
-    this.fetchHighScores(); // Fetch high scores data
+    this.loadAllData(); // Load all data and wait until it's ready
+  }
+  initializeTables() {
+    this.standings = []; // Clear previous standings
   }
 
-  initializeTables() {
-    for (let i = 1; i <= 40; i++) {
-      this.tables.push({
-        heading: `Table ${i}`,
-        data: Array.from({ length: 10 }, (_, index) => ({
-          rank: index + 1,
-          player: `Player ${index + 1}`,
-          score: Math.floor(Math.random() * 100),
-        })),
+  loadAllData() {
+    // Load players and pinballs first
+    Promise.all([this.fetchPlayers(), this.fetchPinballs()])
+      .then(() => {
+        // Then fetch standings once players and pinballs are loaded
+        return this.fetchStandings();
+      })
+      .then(() => {
+        this.fetchLatestScores(); // Ensure latest scores are fetched
+        this.fetchHighScores(); // Ensure high scores are fetched
+      })
+      .then(() => {
+        console.log('All data loaded successfully');
+        this.isLoading = false; // Set loading to false once all data is fetched
+      })
+      .catch(error => {
+        console.error('Failed to load data:', error);
+        this.isLoading = false; // Ensure loading is false even on error
       });
-    }
   }
 
   fetchData() {
@@ -100,8 +117,11 @@ export class AppComponent implements OnInit {
   fetchLatestScores() {
     this.http.get<LatestScore[]>('https://liga.aixtraball.de/latestscores')
       .subscribe(scores => {
-        // Sort scores by points in descending order
-        this.latestScores = scores.sort((a, b) => b.points - a.points);
+        if (scores) {
+          // Sort scores by points in descending order
+          this.latestScores = scores.sort((a, b) => b.points - a.points);
+          console.log('Latest scores loaded:', this.latestScores);
+        }
       }, error => {
         console.error('Failed to fetch latest scores', error);
       });
@@ -110,35 +130,73 @@ export class AppComponent implements OnInit {
   fetchHighScores() {
     this.http.get<HighScore[]>('https://liga.aixtraball.de/total_highscore')
       .subscribe(highScores => {
-        // Sort high scores by rank in descending order
-        this.highScores = highScores.sort((a, b) => a.rank - b.rank);
+        if (highScores) {
+          // Sort high scores by rank in descending order
+          this.highScores = highScores.sort((a, b) => a.rank - b.rank);
+          console.log('High scores loaded:', this.highScores);
+        }
       }, error => {
         console.error('Failed to fetch high scores', error);
       });
   }
 
-  fetchPlayers() {
-    this.http.get<Player[]>('https://liga.aixtraball.de/players')
-      .subscribe(players => {
-        this.players = players.reduce((acc: PlayerMap, player) => {
-          acc[player.abbreviation] = player.name;
-          return acc;
-        }, {});
+  fetchPlayers(): Promise<void> {
+    return this.http.get<Player[]>('https://liga.aixtraball.de/players')
+      .toPromise()
+      .then(players => {
+        if (players) {
+          this.players = players.reduce((acc: PlayerMap, player) => {
+            acc[player.abbreviation] = player.name;
+            return acc;
+          }, {});
+          console.log('Players loaded:', this.players);
+        }
       }, error => {
         console.error('Failed to fetch players', error);
       });
   }
 
-  fetchPinballs() {
-    this.http.get<Pinball[]>('https://liga.aixtraball.de/pinball')
-      .subscribe(pinballs => {
-        this.pinballs = pinballs.reduce((acc: PinballMap, pinball) => {
-          acc[pinball.abbreviation] = pinball.long_name;
-          return acc;
-        }, {});
+  fetchPinballs(): Promise<void> {
+    return this.http.get<Pinball[]>('https://liga.aixtraball.de/pinball')
+      .toPromise()
+      .then(pinballs => {
+        if (pinballs) {
+          this.pinballs = pinballs.reduce((acc: PinballMap, pinball) => {
+            acc[pinball.abbreviation] = pinball.long_name;
+            return acc;
+          }, {});
+          console.log('Pinballs loaded:', this.pinballs);
+        }
       }, error => {
         console.error('Failed to fetch pinballs', error);
       });
+  }
+
+  fetchStandings(): Promise<void> {
+    const promises = Object.keys(this.pinballs).map(pinballAbbreviation => {
+      const pinballName = this.pinballs[pinballAbbreviation];
+      return this.http.get<PinballHighScore[]>(`https://liga.aixtraball.de/highscore/pinball/${pinballAbbreviation}`)
+        .toPromise()
+        .then(scores => {
+          if (scores) {
+            const standingsData = scores.map((score, index) => ({
+              rank: index + 1, // Rank based on order in array
+              player: this.formatPlayerName(this.players[score.player] || score.player),
+              score: score.score
+            }));
+            this.standings.push({
+              heading: pinballName,
+              data: standingsData
+            });
+            console.log(`Standings for ${pinballName} loaded:`, standingsData);
+          }
+        }, error => {
+          console.error(`Failed to fetch standings for ${pinballName}`, error);
+        });
+    });
+    return Promise.all(promises).then(() => {
+      this.filteredTables = this.standings; // Ensure filtered tables are up-to-date
+    });
   }
 
   formatNumberWithSeparators(value: number): string {
@@ -169,7 +227,7 @@ export class AppComponent implements OnInit {
 
   onSearch(event: any) {
     this.isSearching = !!this.searchQuery.trim();
-    this.filteredTables = this.tables.filter((table) =>
+    this.filteredTables = this.standings.filter((table) =>
       table.heading.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
     if (this.isSearching) {
@@ -208,9 +266,7 @@ export class AppComponent implements OnInit {
         this.refreshTime = 60; // Reset countdown
         this.fetchData(); // Refresh data
         this.fetchLatestScores(); // Refresh latest scores
-        this.fetchPlayers(); // Refresh players
-        this.fetchPinballs(); // Refresh pinballs
-        this.fetchHighScores(); // Refresh high scores
+        this.loadAllData(); // Reload all data
       }
     }, 1000); // Update every second
   }

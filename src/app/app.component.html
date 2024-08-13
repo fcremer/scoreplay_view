@@ -23,7 +23,11 @@
 </ion-header>
 
 <ion-content>
-  <div class="widget-container">
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Loading data, please wait...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="widget-container">
     <div class="widget">
       <h2 class="widget-heading">Standings</h2>
       <ion-searchbar
@@ -48,7 +52,7 @@
               <tr *ngFor="let row of table.data">
                 <td>{{ row.rank }}</td>
                 <td>{{ row.player }}</td>
-                <td>{{ row.score }}</td>
+                <td>{{ formatNumberWithSeparators(row.score) }}</td>
               </tr>
             </tbody>
           </table>
@@ -72,7 +76,8 @@
             <td>{{ formatNumberWithSeparators(score.total_points) }}</td>
           </tr>
         </tbody>
-      </table>    </div>
+      </table>    
+    </div>
     <div class="widget">
       <h2 class="widget-heading">Latest Scores</h2>
       <table class="ranking-table">

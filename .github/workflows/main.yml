@@ -9,7 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -17,7 +19,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
-        platforms: linux/amd64,linux/arm64
+        platforms: ${{ matrix.platform }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -32,6 +34,8 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        platforms: linux/amd64,linux/arm64
+        platforms: ${{ matrix.platform }}
         push: true
-        tags: ${{ secrets.DOCKER_REPO }}/scoreplay_view:latest
+        tags: ${{ secrets.DOCKER_REPO }}/scoreplay_view:${{ matrix.platform }}-latest
+        cache-from: type=registry,ref=${{ secrets.DOCKER_REPO }}/scoreplay_view:${{ matrix.platform }}-cache
+        cache-to: type=registry,ref=${{ secrets.DOCKER_REPO }}/scoreplay_view:${{ matrix.platform }}-cache,mode=max

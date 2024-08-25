@@ -122,7 +122,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchLatestScores() {
-    this.http.get<LatestScore[]>('https://liga.aixtraball.de/latestscores')
+    this.http.get<LatestScore[]>('https://backend.aixplay.aixtraball.de/latestscores')
       .subscribe(scores => {
         if (scores) {
           this.latestScores = scores.sort((a, b) => b.points - a.points);
@@ -134,7 +134,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchHighScores() {
-    this.http.get<HighScore[]>('https://liga.aixtraball.de/total_highscore')
+    this.http.get<HighScore[]>('https://backend.aixplay.aixtraball.de/total_highscore')
       .subscribe(highScores => {
         if (highScores) {
           this.highScores = highScores.sort((a, b) => a.rank - b.rank);
@@ -146,7 +146,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchPlayers(): Promise<void> {
-    return this.http.get<Player[]>('https://liga.aixtraball.de/players')
+    return this.http.get<Player[]>('https://backend.aixplay.aixtraball.de/players')
       .toPromise()
       .then(players => {
         if (players) {
@@ -163,7 +163,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchPinballs(): Promise<void> {
-    return this.http.get<Pinball[]>('https://liga.aixtraball.de/pinball')
+    return this.http.get<Pinball[]>('https://backend.aixplay.aixtraball.de/pinball')
       .toPromise()
       .then(pinballs => {
         if (pinballs) {
@@ -181,7 +181,7 @@ export class AppComponent implements OnInit {
   fetchStandings(): Promise<void> {
     const promises = Object.keys(this.pinballs).map(pinballAbbreviation => {
       const pinballName = this.pinballs[pinballAbbreviation];
-      return this.http.get<PinballHighScore[]>(`https://liga.aixtraball.de/highscore/pinball/${pinballAbbreviation}`)
+      return this.http.get<PinballHighScore[]>(`https://backend.aixplay.aixtraball.de/highscore/pinball/${pinballAbbreviation}`)
         .toPromise()
         .then(scores => {
           if (scores) {
@@ -207,7 +207,7 @@ export class AppComponent implements OnInit {
 
   checkMatch() {
     if (this.selectedPlayer1 && this.selectedPlayer2) {
-      const endpoint = `https://liga.aixtraball.de/matchsuggestion/${this.selectedPlayer1}/${this.selectedPlayer2}`;
+      const endpoint = `https://backend.aixplay.aixtraball.de/matchsuggestion/${this.selectedPlayer1}/${this.selectedPlayer2}`;
       this.http.get<{ common_unplayed_machines: string[] }>(endpoint)
         .subscribe(response => {
           console.log('Match suggestion response:', response);
@@ -227,7 +227,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchFreeScores() {
-    this.http.get<string[]>('https://liga.aixtraball.de/getfreescores')
+    this.http.get<string[]>('https://backend.aixplay.aixtraball.de/getfreescores')
       .subscribe(abbreviations => {
         if (abbreviations) {
           this.freeScoreMachines = abbreviations.map(abbreviation => this.pinballs[abbreviation] || abbreviation);

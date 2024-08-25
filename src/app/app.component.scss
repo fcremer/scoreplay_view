@@ -36,6 +36,13 @@
     object-fit: contain; /* Ensure the image scales nicely */
   }
   
+  /* Dark mode specific styles */
+  @media (prefers-color-scheme: dark) {
+    .header-logo {
+      content: url('/assets/logo_dark.png'); /* Replace the logo with the dark mode version */
+    }
+  }
+  
   .circle-bg {
     fill: none;
     stroke: #eee;

@@ -18,7 +18,6 @@
         />
         <text x="18" y="20.35" class="timer-text">{{ refreshTime }}</text>
       </svg>
-      <!-- Logo added to the right of the countdown -->
       <img src="assets/logo.png" alt="Logo" class="header-logo" />
     </div>
   </ion-toolbar>
@@ -42,7 +41,7 @@
           <table class="ranking-table">
             <thead>
               <tr>
-                <th colspan="3">{{ table.heading }}</th>
+                <th colspan="4">{{ table.heading }}</th>
               </tr>
               <tr>
                 <th>Rank</th>
@@ -52,7 +51,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let row of table.data">
-                <td>{{ row.rank }}</td>
+                <td>{{ row.guest ? '(G)' : row.rank }}</td>
                 <td>{{ row.player }}</td>
                 <td>{{ formatNumberWithSeparators(row.score) }}</td>
               </tr>
@@ -69,6 +68,7 @@
           <tr>
             <th>Rank</th>
             <th>Player</th>
+            <th>Progress</th>
             <th>Total Points</th>
           </tr>
         </thead>
@@ -76,6 +76,7 @@
           <tr *ngFor="let score of highScores">
             <td>{{ score.rank }}</td>
             <td>{{ players[score.player] || score.player }}</td>
+            <td>{{ progressData[score.player] || 'Loading...' }}</td>
             <td>{{ formatNumberWithSeparators(score.total_points) }}</td>
           </tr>
         </tbody>
@@ -87,7 +88,7 @@
       <table class="ranking-table">
         <thead>
           <tr>
-            <th></th> <!-- New column for medals -->
+            <th></th>
             <th>Player</th>
             <th>Pinball</th>
             <th>Score</th>
@@ -142,29 +143,28 @@
               {{ player.name }}
             </ion-select-option>
           </ion-select>
-    
+
           <!-- Reset button with icon -->
           <ion-button (click)="resetSelections()" fill="clear">
             <ion-icon name="refresh-circle-outline" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
       </div>
+
       <div class="match-suggestor-container">
-        <!-- Display message if no players are selected -->
         <div *ngIf="!selectedPlayer1 || !selectedPlayer2" class="no-selection">
           <ion-icon name="arrow-up-outline"></ion-icon>
           <p>Choose players</p>
         </div>
-        <!-- Display sad smiley if there are no matches -->
         <div *ngIf="selectedPlayer1 && selectedPlayer2 && matchSuggestions.length === 0" class="no-matches">
           <ion-icon name="sad-outline" style="color: gray; font-size: 2em;"></ion-icon>
           <p style="color: gray;">No matches</p>
         </div>
-        <!-- Match suggestions -->
         <div *ngFor="let suggestion of matchSuggestions" class="pinball-group">
           <div class="pinball-row">
-              {{ suggestion.pinballName }}
+            {{ suggestion.pinballName }}
             <div class="suggestion-list">
+              <!-- Display match details here if needed -->
             </div>
           </div>
         </div>
@@ -182,3 +182,5 @@
         </div>
       </div>
     </div>
+  </div>
+</ion-content>

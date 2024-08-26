@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-// Interfaces for defining data structures
 interface TableData {
   heading: string;
-  data: { rank: number; player: string; score: number }[];
+  data: { rank: number; player: string; score: number; points?: number; guest?: boolean }[];
 }
 
 interface LatestScore {
@@ -12,13 +11,15 @@ interface LatestScore {
   pinball: string;
   player: string;
   points: number;
-  rank: number | null; // Rank can be null
+  rank: number | null;
 }
 
 interface PinballHighScore {
   player: string;
-  points: number; // Represents the rank as points
-  score: number;  // Represents the score
+  points: number;
+  score: number;
+  rank: number;
+  guest?: boolean;
 }
 
 interface HighScore {
@@ -39,11 +40,11 @@ interface Pinball {
 }
 
 interface PlayerMap {
-  [key: string]: string; // Index signature for player mapping
+  [key: string]: string;
 }
 
 interface PinballMap {
-  [key: string]: string; // Index signature for pinball mapping
+  [key: string]: string;
 }
 
 @Component({
@@ -52,7 +53,6 @@ interface PinballMap {
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  // Component state variables
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
@@ -74,8 +74,9 @@ export class AppComponent implements OnInit {
   playerList: Player[] = [];
   selectedPlayer1: string = '';
   selectedPlayer2: string = '';
-  commonUnplayedPinballs: string[] = []; // List to store common unplayed pinballs
+  commonUnplayedPinballs: string[] = [];
   matchSuggestions: { pinballName: string; matches: { player1: string; player2: string }[] }[] = [];
+  progressData: { [key: string]: string } = {};
 
   constructor(private http: HttpClient) {}
 
@@ -93,7 +94,7 @@ export class AppComponent implements OnInit {
   }
 
   initializeTables() {
-    this.standings = []; // Clear previous standings
+    this.standings = [];
   }
 
   loadAllData() {
@@ -139,9 +140,25 @@ export class AppComponent implements OnInit {
         if (highScores) {
           this.highScores = highScores.sort((a, b) => a.rank - b.rank);
           console.log('High scores loaded:', this.highScores);
+
+          highScores.forEach(score => {
+            this.fetchPlayerProgress(score.player);
+          });
         }
       }, error => {
         console.error('Failed to fetch high scores', error);
+      });
+  }
+
+  fetchPlayerProgress(playerAbbreviation: string) {
+    this.http.get<{ tournament_progress: string }>(`https://backend.aixplay.aixtraball.de/get_player/${playerAbbreviation}`)
+      .subscribe(playerData => {
+        if (playerData) {
+          this.progressData[playerAbbreviation] = playerData.tournament_progress;
+          console.log(`Progress for ${playerAbbreviation}:`, playerData.tournament_progress);
+        }
+      }, error => {
+        console.error(`Failed to fetch progress for player ${playerAbbreviation}`, error);
       });
   }
 
@@ -185,16 +202,17 @@ export class AppComponent implements OnInit {
         .toPromise()
         .then(scores => {
           if (scores) {
-            const standingsData = scores.map((score, index) => ({
-              rank: index + 1,
+            const standingsData = scores.map(score => ({
+              rank: score.rank,
               player: this.formatPlayerName(this.players[score.player] || score.player),
-              score: score.score
+              score: score.score,
+              points: score.points,
+              guest: score.guest || false
             }));
             this.standings.push({
               heading: pinballName,
               data: standingsData
             });
-            console.log(`Standings for ${pinballName} loaded:`, standingsData);
           }
         }, error => {
           console.error(`Failed to fetch standings for ${pinballName}`, error);
@@ -205,6 +223,80 @@ export class AppComponent implements OnInit {
     });
   }
 
+  formatNumberWithSeparators(value: number): string {
+    return value.toLocaleString('en-US').replace(/,/g, '.');
+  }
+
+  formatPlayerName(name: string): string {
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+    }
+    return name;
+  }
+
+  startAutoScroll() {
+    this.scrollInterval = setInterval(() => {
+      if (!this.isSearching) {
+        const container = document.querySelector('.table-container');
+        if (container) {
+          container.scrollTop += 1;
+          if (container.scrollTop >= container.scrollHeight - container.clientHeight) {
+            container.scrollTop = 0;
+          }
+        }
+      }
+    }, 100);
+  }
+
+  onSearch(event: any) {
+    this.isSearching = !!this.searchQuery.trim();
+    this.filteredTables = this.standings.filter((table) =>
+      table.heading.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+    if (this.isSearching) {
+      clearInterval(this.scrollInterval);
+    } else {
+      this.startAutoScroll();
+    }
+  }
+
+  updateTime() {
+    const now = new Date();
+    this.currentHourMinute = now
+      .getHours()
+      .toString()
+      .padStart(2, '0') +
+      ':' +
+      now.getMinutes().toString().padStart(2, '0');
+    setInterval(() => {
+      const now = new Date();
+      this.currentHourMinute =
+        now.getHours().toString().padStart(2, '0') +
+        ':' +
+        now.getMinutes().toString().padStart(2, '0');
+    }, 60000); // Update time every minute
+  }
+  startCountdown() {
+    setInterval(() => {
+      if (this.refreshTime > 0) {
+        this.refreshTime -= 1;
+        this.progress = (this.refreshTime / 60) * 100;
+      } else {
+        this.refreshTime = 60; // Reset countdown
+        this.fetchData(); // Refresh data
+        this.fetchLatestScores(); // Refresh latest scores
+        this.loadAllData(); // Reload all data
+      }
+    }, 1000); // Update every second
+  }
+
+  resetSelections() {
+    this.selectedPlayer1 = '';
+    this.selectedPlayer2 = '';
+    this.matchSuggestions = [];
+  }
+
   checkMatch() {
     if (this.selectedPlayer1 && this.selectedPlayer2) {
       const endpoint = `https://backend.aixplay.aixtraball.de/matchsuggestion/${this.selectedPlayer1}/${this.selectedPlayer2}`;
@@ -212,7 +304,7 @@ export class AppComponent implements OnInit {
         .subscribe(response => {
           console.log('Match suggestion response:', response);
           // Update the list of common unplayed pinballs
-          this.commonUnplayedPinballs = response.common_unplayed_machines.map(pinballAbbr => 
+          this.commonUnplayedPinballs = response.common_unplayed_machines.map(pinballAbbr =>
             this.pinballs[pinballAbbr] || pinballAbbr
           );
           this.matchSuggestions = response.common_unplayed_machines.map(pinballAbbr => ({
@@ -237,81 +329,4 @@ export class AppComponent implements OnInit {
         console.error('Failed to fetch free scores', error);
       });
   }
-
-  formatNumberWithSeparators(value: number): string {
-    return value.toLocaleString('en-US').replace(/,/g, '.');
-  }
-
-  formatPlayerName(name: string): string {
-    const parts = name.split(' ');
-    if (parts.length > 1) {
-      return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
-    }
-    return name;
-  }
-  startAutoScroll() {
-    this.scrollInterval = setInterval(() => {
-      if (!this.isSearching) {
-        const container = document.querySelector('.table-container');
-        if (container) {
-          container.scrollTop += 1;
-          if (container.scrollTop >= container.scrollHeight - container.clientHeight) {
-            container.scrollTop = 0;
-          }
-        }
-      }
-    }, 100); // Adjust scrolling speed
-  }
-
-  onSearch(event: any) {
-    this.isSearching = !!this.searchQuery.trim();
-    this.filteredTables = this.standings.filter((table) =>
-      table.heading.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
-    if (this.isSearching) {
-      clearInterval(this.scrollInterval);
-    } else {
-      this.startAutoScroll();
-    }
-  }
-
-  updateTime() {
-    const now = new Date();
-    this.currentHourMinute = now
-      .getHours()
-      .toString()
-      .padStart(2, '0') +
-      ':' +
-      now
-        .getMinutes()
-        .toString()
-        .padStart(2, '0');
-    setInterval(() => {
-      const now = new Date();
-      this.currentHourMinute =
-        now.getHours().toString().padStart(2, '0') +
-        ':' +
-        now.getMinutes().toString().padStart(2, '0');
-    }, 60000); // Update time every minute
-  }
-
-  startCountdown() {
-    setInterval(() => {
-      if (this.refreshTime > 0) {
-        this.refreshTime -= 1;
-        this.progress = (this.refreshTime / 60) * 100;
-      } else {
-        this.refreshTime = 60; // Reset countdown
-        this.fetchData(); // Refresh data
-        this.fetchLatestScores(); // Refresh latest scores
-        this.loadAllData(); // Reload all data
-      }
-    }, 1000); // Update every second
-  }
-  resetSelections() {
-    this.selectedPlayer1 = '';
-    this.selectedPlayer2 = '';
-    this.matchSuggestions = [];
-  }
 }
-

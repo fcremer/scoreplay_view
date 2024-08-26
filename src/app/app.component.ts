@@ -76,6 +76,8 @@ export class AppComponent implements OnInit {
   selectedPlayer2: string = '';
   commonUnplayedPinballs: string[] = []; // List to store common unplayed pinballs
   matchSuggestions: { pinballName: string; matches: { player1: string; player2: string }[] }[] = [];
+  progressData: { [key: string]: string } = {};
+
 
   constructor(private http: HttpClient) {}
 
@@ -139,9 +141,26 @@ export class AppComponent implements OnInit {
         if (highScores) {
           this.highScores = highScores.sort((a, b) => a.rank - b.rank);
           console.log('High scores loaded:', this.highScores);
+          
+          // Fetch progress data for each player
+          highScores.forEach(score => {
+            this.fetchPlayerProgress(score.player);
+          });
         }
       }, error => {
         console.error('Failed to fetch high scores', error);
+      });
+  }
+  
+  fetchPlayerProgress(playerAbbreviation: string) {
+    this.http.get<{ tournament_progress: string }>(`https://backend.aixplay.aixtraball.de/get_player/${playerAbbreviation}`)
+      .subscribe(playerData => {
+        if (playerData) {
+          this.progressData[playerAbbreviation] = playerData.tournament_progress;
+          console.log(`Progress for ${playerAbbreviation}:`, playerData.tournament_progress);
+        }
+      }, error => {
+        console.error(`Failed to fetch progress for player ${playerAbbreviation}`, error);
       });
   }
 

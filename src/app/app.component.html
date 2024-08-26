@@ -69,6 +69,7 @@
           <tr>
             <th>Rank</th>
             <th>Player</th>
+            <th>Progress</th> <!-- New Progress column -->
             <th>Total Points</th>
           </tr>
         </thead>
@@ -76,12 +77,12 @@
           <tr *ngFor="let score of highScores">
             <td>{{ score.rank }}</td>
             <td>{{ players[score.player] || score.player }}</td>
+            <td>{{ progressData[score.player] || 'Loading...' }}</td> <!-- Display progress -->
             <td>{{ formatNumberWithSeparators(score.total_points) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-
     <div class="widget">
       <h2 class="widget-heading"><ion-icon name="time-outline"></ion-icon> Latest Scores</h2>
       <table class="ranking-table">

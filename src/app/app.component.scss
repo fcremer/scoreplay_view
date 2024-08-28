@@ -103,8 +103,23 @@ ion-toolbar {
 }
 
 @media (prefers-color-scheme: dark) {
+  .qr-code {
+    content: url('/assets/qr-white.png'); /* Use the white QR code in dark mode */
+  }
+  .qr-code-large {
+    content: url('/assets/qr-white.png'); /* Use the white QR code for the large version in dark mode */
+  }
   .header-logo {
     content: url('/assets/logo_dark.png'); /* Replace the logo with the dark mode version */
+  }
+
+    .qr-modal {
+    background-color: rgba(0, 0, 0, 0.8); /* Dark mode background */
+  }
+
+  .close-modal {
+    background: #000; /* Dark mode close button background */
+    color: #fff; /* White close button text */
   }
 }
 

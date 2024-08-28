@@ -56,6 +56,7 @@ export class AppComponent implements OnInit {
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
+  isQrModalOpen: boolean = false;  // Add this property
   latestScores: LatestScore[] = [];
   highScores: HighScore[] = [];
   players: PlayerMap = {};
@@ -96,7 +97,13 @@ export class AppComponent implements OnInit {
   initializeTables() {
     this.standings = [];
   }
+  openQrModal() {
+    this.isQrModalOpen = true;
+  }
 
+  closeQrModal() {
+    this.isQrModalOpen = false;
+  }
   loadAllData() {
     Promise.all([this.fetchPlayers(), this.fetchPinballs()])
       .then(() => {

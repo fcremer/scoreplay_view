@@ -6,9 +6,16 @@
     <div class="header-right">
       <span class="clock">{{ currentHourMinute }}</span>
       <img src="assets/logo.png" alt="Logo" class="header-logo" />
+      <img
+        src="assets/qr-black.png"
+        alt="QR Code"
+        class="qr-code"
+        (click)="openQrModal()"
+      />
     </div>
   </ion-toolbar>
 </ion-header>
+
 
 <ion-content>
   <div *ngIf="isLoading" class="loading-indicator">
@@ -168,6 +175,16 @@
           </ul>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="qr-modal" *ngIf="isQrModalOpen">
+    <div class="modal-content">
+      <img
+        src="assets/qr-black.png"
+        alt="QR Code Zoomed"
+        class="qr-code-large"
+      />
+      <button class="close-modal" (click)="closeQrModal()">×</button>
     </div>
   </div>
 </ion-content>

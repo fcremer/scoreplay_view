@@ -278,6 +278,8 @@ export class AppComponent implements OnInit {
     }, 60000); // Update time every minute
   }
   startCountdown() {
+    this.progress = 100; // Start with the bar fully filled
+  
     setInterval(() => {
       if (this.refreshTime > 0) {
         this.refreshTime -= 1;

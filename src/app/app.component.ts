@@ -1,5 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {
+  trigger,
+  style,
+  animate,
+  transition,
+} from '@angular/animations';
 
 interface TableData {
   heading: string;
@@ -51,12 +57,23 @@ interface PinballMap {
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(100%)' }),
+        animate('1s ease-in', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [
+        animate('1s ease-out', style({ opacity: 0, transform: 'translateY(-100%)' })),
+      ]),
+    ]),
+  ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
-  isQrModalOpen: boolean = false;  // Add this property
+  isQrModalOpen: boolean = false;
   latestScores: LatestScore[] = [];
   highScores: HighScore[] = [];
   players: PlayerMap = {};
@@ -69,7 +86,6 @@ export class AppComponent implements OnInit {
   isSearching: boolean = false;
   tables: TableData[] = [];
   filteredTables: TableData[] = [];
-  scrollInterval: any;
   isLoading: boolean = true;
   freeScoreMachines: string[] = [];
   playerList: Player[] = [];
@@ -79,12 +95,14 @@ export class AppComponent implements OnInit {
   matchSuggestions: { pinballName: string; matches: { player1: string; player2: string }[] }[] = [];
   progressData: { [key: string]: string } = {};
 
+  currentTableIndex: number = 0;
+  tableRotationInterval: any;
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.initializeTables();
     this.filteredTables = this.tables;
-    this.startAutoScroll();
     this.fetchData();
     this.updateTime();
     this.startCountdown();
@@ -92,6 +110,13 @@ export class AppComponent implements OnInit {
     this.fetchFreeScores();
     this.fetchPlayers();
     this.fetchPinballs();
+    this.startTableRotation();
+  }
+
+  ngOnDestroy() {
+    if (this.tableRotationInterval) {
+      clearInterval(this.tableRotationInterval);
+    }
   }
 
   initializeTables() {
@@ -242,51 +267,9 @@ export class AppComponent implements OnInit {
     return name;
   }
 
-  startAutoScroll() {
-    this.scrollInterval = setInterval(() => {
-      if (!this.isSearching) {
-        const container = document.querySelector('.table-container');
-        if (container) {
-          container.scrollTop += 1;
-          if (container.scrollTop >= container.scrollHeight - container.clientHeight) {
-            container.scrollTop = 0;
-          }
-        }
-      }
-    }, 100);
-  }
-
-  onSearch(event: any) {
-    this.isSearching = !!this.searchQuery.trim();
-    this.filteredTables = this.standings.filter((table) =>
-      table.heading.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
-    if (this.isSearching) {
-      clearInterval(this.scrollInterval);
-    } else {
-      this.startAutoScroll();
-    }
-  }
-
-  updateTime() {
-    const now = new Date();
-    this.currentHourMinute = now
-      .getHours()
-      .toString()
-      .padStart(2, '0') +
-      ':' +
-      now.getMinutes().toString().padStart(2, '0');
-    setInterval(() => {
-      const now = new Date();
-      this.currentHourMinute =
-        now.getHours().toString().padStart(2, '0') +
-        ':' +
-        now.getMinutes().toString().padStart(2, '0');
-    }, 60000); // Update time every minute
-  }
   startCountdown() {
     this.progress = 100; // Start with the bar fully filled
-  
+
     setInterval(() => {
       if (this.refreshTime > 0) {
         this.refreshTime -= 1;
@@ -329,13 +312,57 @@ export class AppComponent implements OnInit {
 
   fetchFreeScores() {
     this.http.get<string[]>('https://backend.aixplay.aixtraball.de/getfreescores')
-      .subscribe(abbreviations => {
-        if (abbreviations) {
-          this.freeScoreMachines = abbreviations.map(abbreviation => this.pinballs[abbreviation] || abbreviation);
+      .subscribe(machines => {
+        if (machines) {
+          this.freeScoreMachines = machines;
           console.log('Free score machines loaded:', this.freeScoreMachines);
         }
       }, error => {
         console.error('Failed to fetch free scores', error);
       });
+  }
+
+  updateTime() {
+    const now = new Date();
+    this.currentHourMinute = now
+      .getHours()
+      .toString()
+      .padStart(2, '0') +
+      ':' +
+      now.getMinutes().toString().padStart(2, '0');
+    setInterval(() => {
+      const now = new Date();
+      this.currentHourMinute =
+        now.getHours().toString().padStart(2, '0') +
+        ':' +
+        now.getMinutes().toString().padStart(2, '0');
+    }, 60000); // Update time every minute
+  }
+
+  startTableRotation() {
+    this.tableRotationInterval = setInterval(() => {
+      this.showNextTable();
+    }, 10000); // Rotate every 10 seconds
+  }
+
+  showNextTable() {
+    if (this.isSearching) {
+      return; // Do not rotate tables when searching
+    }
+    this.currentTableIndex = (this.currentTableIndex + 1) % this.filteredTables.length;
+  }
+
+  onSearch(event: any) {
+    this.isSearching = !!this.searchQuery.trim();
+    this.filteredTables = this.standings.filter((table) =>
+      table.heading.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+    if (this.isSearching) {
+      clearInterval(this.tableRotationInterval);
+    } else {
+      this.startTableRotation();
+    }
+    // Reset to the first table in the filtered list
+    this.currentTableIndex = 0;
   }
 }

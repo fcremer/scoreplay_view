@@ -24,43 +24,68 @@
   <div *ngIf="!isLoading" class="widget-container">
     <!-- Standings Widget -->
     <div class="widget standings-widget">
-      <h2 class="widget-heading"><ion-icon name="trophy-outline"></ion-icon> Standings</h2>
-      <ion-searchbar
-        [(ngModel)]="searchQuery"
-        placeholder="Search by pinball"
-        (ionInput)="onSearch($event)"
-      ></ion-searchbar>
+      <h2 class="widget-heading">
+        <ion-icon name="trophy-outline"></ion-icon> Standings
+      </h2>
+      <!-- Navigation Buttons moved to the top -->
+      <div class="navigation-buttons" *ngIf="hasStandings">
+        <button class="nav-button left" (click)="showPreviousTable()">
+          &#8592;
+        </button>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          placeholder="Search by pinball"
+          (ionInput)="onSearch($event)"
+        ></ion-searchbar>
+        <button class="nav-button right" (click)="showNextTable()">
+          &#8594;
+        </button>
+      </div>
       <div class="table-container">
-        <ng-container *ngIf="filteredTables.length > 0">
-          <table class="ranking-table" [@fadeInOut]>
-            <thead>
-              <tr>
-                <th colspan="3">{{ filteredTables[currentTableIndex].heading }}</th>
-              </tr>
-              <tr>
-                <th>Rank</th>
-                <th>Player</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of filteredTables[currentTableIndex].data">
-                <td>{{ row.guest ? '(G)' : row.rank }}</td>
-                <td>{{ row.player }}</td>
-                <td>{{ formatNumberWithSeparators(row.score) }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <ng-container *ngIf="hasStandings; else noStandings">
+          <ng-container *ngIf="filteredTables.length > 0">
+            <table class="ranking-table" [@fadeInOut]>
+              <thead>
+                <tr>
+                  <th colspan="3">
+                    {{ filteredTables[currentTableIndex].heading }}
+                  </th>
+                </tr>
+                <tr>
+                  <th>Rank</th>
+                  <th>Player</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let row of filteredTables[currentTableIndex].data"
+                >
+                  <td>{{ row.guest ? '(G)' : row.rank }}</td>
+                  <td>{{ row.player }}</td>
+                  <td>{{ formatNumberWithSeparators(row.score) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+          <div *ngIf="filteredTables.length === 0" class="no-results">
+            <p>No results found.</p>
+          </div>
         </ng-container>
-        <div *ngIf="filteredTables.length === 0" class="no-results">
-          <p>No results found.</p>
-        </div>
+        <ng-template #noStandings>
+          <div class="no-standings">
+            <ion-icon name="sad-outline"></ion-icon>
+            <p>No scores submitted so far.</p>
+          </div>
+        </ng-template>
       </div>
     </div>
 
     <!-- Season Leaderboard Widget -->
     <div class="widget">
-      <h2 class="widget-heading"><ion-icon name="calendar-outline"></ion-icon> Season Leaderboard</h2>
+      <h2 class="widget-heading">
+        <ion-icon name="calendar-outline"></ion-icon> Season Leaderboard
+      </h2>
       <div class="table-container">
         <table class="ranking-table">
           <thead>
@@ -85,7 +110,9 @@
 
     <!-- Latest Scores Widget -->
     <div class="widget">
-      <h2 class="widget-heading"><ion-icon name="time-outline"></ion-icon> Latest Scores</h2>
+      <h2 class="widget-heading">
+        <ion-icon name="time-outline"></ion-icon> Latest Scores
+      </h2>
       <div class="table-container">
         <table class="ranking-table">
           <thead>
@@ -134,7 +161,7 @@
               {{ player.name }}
             </ion-select-option>
           </ion-select>
-  
+
           <ion-select
             placeholder="Select Player 2"
             [(ngModel)]="selectedPlayer2"
@@ -156,15 +183,31 @@
       </div>
 
       <div class="match-suggestor-container">
-        <div *ngIf="!selectedPlayer1 || !selectedPlayer2" class="no-selection">
+        <div
+          *ngIf="!selectedPlayer1 || !selectedPlayer2"
+          class="no-selection"
+        >
           <ion-icon name="arrow-up-outline"></ion-icon>
           <p>Choose players</p>
         </div>
-        <div *ngIf="selectedPlayer1 && selectedPlayer2 && matchSuggestions.length === 0" class="no-matches">
-          <ion-icon name="sad-outline" style="color: gray; font-size: 2em;"></ion-icon>
+        <div
+          *ngIf="
+            selectedPlayer1 &&
+            selectedPlayer2 &&
+            matchSuggestions.length === 0
+          "
+          class="no-matches"
+        >
+          <ion-icon
+            name="sad-outline"
+            style="color: gray; font-size: 2em;"
+          ></ion-icon>
           <p style="color: gray;">No matches</p>
         </div>
-        <div *ngFor="let suggestion of matchSuggestions" class="pinball-group">
+        <div
+          *ngFor="let suggestion of matchSuggestions"
+          class="pinball-group"
+        >
           <div class="pinball-row">
             {{ suggestion.pinballName }}
             <div class="suggestion-list">

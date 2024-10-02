@@ -1,3 +1,4 @@
+/* Header Styles */
 ion-header {
   position: relative;
   height: 70px; /* Ensure the header has a consistent height */
@@ -6,7 +7,7 @@ ion-header {
 .qr-code {
   height: 100%; /* Match the height of the header */
   width: auto; /* Maintain aspect ratio */
-  max-height: 50px; /* Set a maximum height to prevent it from becoming too large */
+  max-height: 50px; /* Prevent it from becoming too large */
   cursor: pointer;
   margin-right: 16px;
 }
@@ -53,82 +54,113 @@ ion-header {
   background-color: #ddd;
 }
 
+/* Progress Bar Styles */
 .progress-bar-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px; /* Adjust the height as needed */
-  background-color: #e0e0e0; /* Background color of the empty bar */
+  height: 4px;
+  background-color: #e0e0e0;
   z-index: 10;
 }
 
 .progress-bar {
   height: 100%;
-  background-color: var(--ion-color-primary); /* Color of the filled bar */
-  transition: width 1s linear; /* Smooth transition for the width */
+  background-color: var(--ion-color-primary);
+  transition: width 1s linear;
 }
 
 ion-toolbar {
   display: flex;
-  justify-content: flex-end; /* Align content to the right */
-  align-items: center; /* Center items vertically */
-  padding: 8px 16px; /* Add padding for spacing */
-  height: 70px; /* Adjust height as needed */
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 16px;
+  height: 70px;
   position: relative;
-  z-index: 5; /* Ensure the toolbar is above the progress bar */
+  z-index: 5;
 }
 
 .header-right {
   display: flex;
-  align-items: center; /* Vertically center items */
-  justify-content: flex-end; /* Align items to the right */
+  align-items: center;
+  justify-content: flex-end;
   width: 100%;
-  padding-right: 16px; /* Optional: Add right padding for spacing from edge */
-  padding-top: 8px; /* Add padding to the top for spacing from the progress bar */
+  padding-right: 16px;
+  padding-top: 8px;
 }
 
 .clock {
   font-size: 1.75em;
   font-weight: bold;
   color: var(--ion-color-primary);
-  margin-right: 24px; /* Increase margin to create more space */
+  margin-right: 24px;
   line-height: 40px;
 }
 
 .header-logo {
-  width: auto; /* Set a wider width for the logo */
-  height: 40px; /* Set a fixed height for the logo to align with the QR code */
-  margin-left: 8px; /* Adjust margin to create space between countdown and logo */
+  width: auto;
+  height: 40px;
+  margin-left: 8px;
   object-fit: contain;
 }
 
+/* Dark Mode Adjustments */
 @media (prefers-color-scheme: dark) {
   .qr-code {
-    content: url('/assets/qr-white.png'); /* Use the white QR code in dark mode */
+    content: url('/assets/qr-white.png');
   }
   .qr-code-large {
-    content: url('/assets/qr-white.png'); /* Use the white QR code for the large version in dark mode */
+    content: url('/assets/qr-white.png');
   }
   .header-logo {
-    content: url('/assets/logo_dark.png'); /* Replace the logo with the dark mode version */
+    content: url('/assets/logo_dark.png');
   }
 
-    .qr-modal {
-    background-color: rgba(0, 0, 0, 0.8); /* Dark mode background */
+  .qr-modal {
+    background-color: rgba(0, 0, 0, 0.8);
   }
 
   .close-modal {
-    background: #000; /* Dark mode close button background */
-    color: #fff; /* White close button text */
+    background: #000;
+    color: #fff;
+  }
+
+  .widget {
+    background-color: #1F1F1F;
+    color: #fff;
+  }
+
+  .ranking-table th {
+    background-color: transparent;
+    color: var(--ion-color-primary);
+    font-weight: bold;
+    font-size: 1em;
+    text-align: center;
+  }
+  .ranking-table td {
+    text-align: left;
+    padding: 8px;
+    vertical-align: middle;
+  }
+
+  .info-text {
+    color: #fff;
+  }
+
+  .no-selection,
+  .no-matches,
+  .no-scores {
+    color: gray;
   }
 }
 
+/* Content Styles */
 ion-content {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Use full viewport height */
-  overflow: hidden; /* Prevent scrolling */
+  height: 100vh;
+  overflow: hidden;
 }
 
 .widget-container {
@@ -137,27 +169,28 @@ ion-content {
   justify-content: space-around;
   align-items: stretch;
   padding: 20px;
-  height: calc(100vh - 70px); /* Fill the space below the header */
+  height: calc(100vh - 70px);
 }
 
+/* Widget Styles */
 .widget {
-  width: 22%; /* Adjust width to fit four widgets per row */
-  height: 100%; /* Make each widget take full height of the container */
-  background-color: var(--ion-background-color, #f4f4f4); /* Default light mode color */
+  width: 22%;
+  height: 100%;
+  background-color: var(--ion-background-color, #f4f4f4);
   margin: 10px;
   border-radius: 8px;
-  text-align: center;
+  text-align: left;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   position: relative;
-  overflow: hidden; /* Ensure overflow is hidden */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  color: var(--ion-text-color, #000); /* Default text color */
+  color: var(--ion-text-color, #000);
 }
 
 .widget-heading {
   font-size: 1.5em;
-  color: var(--ion-color-primary); /* Use primary color for the heading */
+  color: var(--ion-color-primary);
   margin: 10px 0;
   text-align: center;
   font-weight: bold;
@@ -165,6 +198,7 @@ ion-content {
 
 ion-searchbar {
   margin-bottom: 10px;
+  text-align: left;
 }
 
 .table-container {
@@ -174,44 +208,34 @@ ion-searchbar {
 
 .ranking-table {
   width: 100%;
-  margin: 0 auto; /* Center the table horizontally within the container */
+  margin: 0 auto;
   border-collapse: collapse;
-  text-align: center; /* Center-align text for entire table */
 }
 
 .ranking-table th {
-  background-color: transparent; /* Remove default heading background */
-  color: var(--ion-color-primary); /* Primary color for table headings */
+  background-color: transparent;
+  color: var(--ion-color-primary);
   font-weight: bold;
   font-size: 1em;
-  text-align: center; /* Ensure header text is centered */
+  text-align: center;
 }
 
 .ranking-table td {
-  text-align: center; /* Center-align text in table cells */
-  padding: 8px; /* Add padding for better spacing */
-  vertical-align: middle; /* Vertically center content */
+  text-align: left;
+  padding: 8px;
+  vertical-align: middle;
 }
 
-/* Dark mode adjustments for table */
-body.dark .ranking-table th,
-body.dark .ranking-table td {
-  color: #fff; /* Text color for dark mode */
-}
-
-body.dark .ranking-table td {
-  border-color: #333; /* Darker border color in dark mode */
-}
-
+/* Info Text Styles */
 .info-text {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center align the text and icon horizontally */
+  justify-content: flex-start;
   font-size: 0.9em;
-  color: var(--text-color); /* Matches the text color theme */
+  color: var(--text-color);
   margin-bottom: 10px;
-  text-align: center;
-  
+  text-align: left;
+
   ion-icon {
     font-size: 1.1em;
     color: grey;
@@ -219,152 +243,201 @@ body.dark .ranking-table td {
   }
 }
 
+/* Match-Suggester Styles */
 .match-suggestor-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center align the matches vertically */
-  justify-content: flex-start; /* Align to top of container */
+  align-items: flex-start;
+  justify-content: flex-start;
   flex-grow: 1;
   overflow: auto;
 }
 
 .pinball-row {
   width: 100%;
-  align-items: flex-start; /* Align items at the start of the flex container */
-  justify-content: space-between; /* Distribute space between and around content items */
-  margin-bottom: 0; /* Space between each pinball-row */
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0;
 }
 
 .pinball-group {
   width: 80%;
   display: flex;
   align-items: flex-start;
-  margin-bottom: 10px; /* Reduce space between pinball groups */
-}
-
-.pinball-group h3 {
-  margin: 5px 0; /* Reduce margin for pinball group headings */
-  background-color: transparent; /* Remove default heading background */
-  color: var(--ion-color-primary); /* Primary color for table headings */
-  font-weight: bold;
-  font-size: 1em;
+  margin-bottom: 10px;
 }
 
 .pinball-name {
-  width: 100%; /* Width for the pinball name column */
-  text-align: left; /* Align text to the left */
+  width: 100%;
+  text-align: left;
   padding: 10px;
 }
 
 .suggestion-list {
-  width: 70%; /* Width for the suggestion list column */
-  text-align: left; /* Align text to the left */
+  width: 70%;
+  text-align: left;
 }
 
 .free-scores {
   margin-top: 20px;
-  text-align: left; /* Align list to the left */
-}
-
-.free-scores h3 {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-  color: var(--heading-color); /* Use heading color for consistency */
+  text-align: left;
 }
 
 .free-scores ul {
-  list-style-type: none; /* Remove bullet points */
+  list-style-type: none;
   margin: 0;
   padding: 0 20px;
 }
 
 .free-scores li {
   margin-bottom: 5px;
-  color: var(--text-color); /* Use text color for readability */
-  text-align: center;
+  color: var(--text-color);
+  text-align: left;
 }
 
-ion-select {
-  width: 140px; /* Adjust width to fit more comfortably */
-  --padding-start: 10px; /* Ensure proper padding */
-  --padding-end: 10px; /* Ensure proper padding */
-}
-
+/* Player Selection Styles */
 .player-selection {
   display: flex;
-  justify-content: center; /* Center dropdowns and button horizontally */
-  margin-bottom: 10px; /* Space below the dropdowns */
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .dropdown-container {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping if necessary */
-  gap: 10px; /* Space between dropdowns and button */
-  align-items: center; /* Align items vertically in the center */
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+ion-select {
+  width: 140px;
+  --padding-start: 10px;
+  --padding-end: 10px;
 }
 
 ion-button {
-  --padding-start: 0; /* Remove start padding */
-  --padding-end: 0;   /* Remove end padding */
-  --inner-padding-end: 0; /* Remove inner end padding */
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
   --inner-padding-start: 0;
-  --inner-padding-top: 0; /* Remove inner top padding */
-  --inner-padding-bottom: 0; /* Remove inner bottom padding */
+  --inner-padding-top: 0;
+  --inner-padding-bottom: 0;
 }
 
 ion-icon {
-  font-size: 1.5em; /* Adjust icon size as needed */
-  color: var(--ion-color-primary); /* Use the primary color for the icon */
+  font-size: 1.5em;
+  color: var(--ion-color-primary);
 }
 
-@media (prefers-color-scheme: dark) {
-  .widget {
-    background-color: #1F1F1F; /* Dark mode background color */
-    color: #fff; /* Text color for dark mode */
-  }
-
-  .ranking-table th,
-  .ranking-table td {
-    color: #fff; /* Text color for dark mode */
-  }
-
-  .info-text {
-    color: #fff; /* Text color for info text */
-  }
-
-  .no-selection,
-  .no-matches {
-    color: gray; /* Text color for no selection/matches */
-  }
+/* No Results and No Scores Styles */
+.no-results {
+  text-align: center;
+  color: gray;
 }
 
-/* Define keyframes for the bounce animation */
+.no-scores {
+  text-align: center;
+  color: gray;
+  font-size: 1em;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-scores ion-icon {
+  font-size: 2em;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+/* No Standings Styling */
+.no-standings {
+  text-align: center;
+  color: gray;
+  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.no-standings ion-icon {
+  font-size: 3em;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+/* Standings Widget Specific Styles */
+.standings-widget {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.standings-widget .navigation-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.standings-widget .nav-button {
+  background: none;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  color: var(--ion-color-primary);
+  padding: 0 10px;
+}
+
+.standings-widget .nav-button:focus {
+  outline: none;
+}
+
+.standings-widget ion-searchbar {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+.standings-widget .table-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Keyframes for the bounce animation */
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0); /* Start at the initial position */
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
   }
   40% {
-    transform: translateY(-10px); /* Move up by 10px */
+    transform: translateY(-10px);
   }
   60% {
-    transform: translateY(-5px); /* Move up by 5px for a smaller bounce */
+    transform: translateY(-5px);
   }
 }
 
+/* No Selection Styles */
 .no-selection {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the icon and text */
+  align-items: center;
   justify-content: center;
-  padding: 20px 0; /* Add padding to ensure space for animation */
-  min-height: 100px; /* Ensure a minimum height for the container */
-  overflow: visible; /* Allow overflow to prevent clipping */
+  padding: 20px 0;
+  min-height: 100px;
+  overflow: visible;
 }
 
 .no-selection ion-icon {
   color: gray;
   font-size: 2em;
-  animation: bounce 2s infinite; /* 2-second animation duration, infinite iterations */
+  animation: bounce 2s infinite;
 }
 
 .no-selection p {
@@ -372,14 +445,15 @@ ion-icon {
   margin-top: 10px;
 }
 
+/* No Matches Styles */
 .no-matches {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the icon and text */
+  align-items: center;
   justify-content: center;
   padding: 20px 0;
-  min-height: 100px; /* Ensure a minimum height for the container */
-  overflow: visible; /* Allow overflow to prevent clipping */
+  min-height: 100px;
+  overflow: visible;
 }
 
 .no-matches ion-icon {
@@ -390,35 +464,4 @@ ion-icon {
 .no-matches p {
   color: gray;
   margin-top: 10px;
-}
-
-.no-results {
-  text-align: center;
-  color: gray;
-}
-
-/* Specific styles for the Standings widget */
-.standings-widget {
-  height: calc(100% - 20px); /* Adjust for margins */
-  display: flex;
-  flex-direction: column;
-}
-
-.standings-widget .table-container {
-  flex: 1;
-  overflow: hidden; /* Hide overflow to prevent scrollbars */
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.standings-widget .ranking-table {
-  width: 100%;
-  margin: 0 auto;
-  border-collapse: collapse;
-  text-align: center;
-  position: absolute; /* Position absolutely to enable animation */
-  top: 0;
-  left: 0;
 }

@@ -43,8 +43,12 @@
       </div>
       <div class="table-container">
         <ng-container *ngIf="hasStandings; else noStandings">
-          <ng-container *ngIf="filteredTables.length > 0">
-            <table class="ranking-table" [@fadeInOut]>
+          <div
+            [@slideAnimation]="animationState"
+            (@slideAnimation.done)="onAnimationDone($event)"
+            class="animation-wrapper"
+          >
+            <table class="ranking-table">
               <thead>
                 <tr>
                   <th colspan="3">
@@ -67,7 +71,7 @@
                 </tr>
               </tbody>
             </table>
-          </ng-container>
+          </div>
           <div *ngIf="filteredTables.length === 0" class="no-results">
             <p>No results found.</p>
           </div>
@@ -198,46 +202,33 @@
           "
           class="no-matches"
         >
-          <ion-icon
-            name="sad-outline"
-            style="color: gray; font-size: 2em;"
-          ></ion-icon>
-          <p style="color: gray;">No matches</p>
+          <ion-icon name="sad-outline"></ion-icon>
+          <p>No matches</p>
         </div>
         <div
-          *ngFor="let suggestion of matchSuggestions"
-          class="pinball-group"
+          *ngIf="selectedPlayer1 && selectedPlayer2 && matchSuggestions.length > 0"
+          class="match-suggestions"
         >
-          <div class="pinball-row">
-            {{ suggestion.pinballName }}
-            <div class="suggestion-list">
-              <!-- Display match details here if needed -->
-            </div>
+          <div
+            *ngFor="let suggestion of matchSuggestions"
+            class="pinball-suggestion"
+          >
+            <p class="pinball-name">{{ suggestion.pinballName }}</p>
           </div>
         </div>
         <div class="free-scores">
           <h2 class="widget-heading">
             <ion-icon name="bar-chart-outline"></ion-icon> Freebies
           </h2>
+          <div class="info-text">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Fewer scores submitted than points available.
+          </div>
           <ul>
-            <div class="info-text">
-              <ion-icon name="information-circle-outline"></ion-icon>
-              Fewer scores submitted than points available.
-            </div>
             <li *ngFor="let machine of freeScoreMachines">{{ machine }}</li>
           </ul>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="qr-modal" *ngIf="isQrModalOpen">
-    <div class="modal-content">
-      <img
-        src="assets/qr-black.png"
-        alt="QR Code Zoomed"
-        class="qr-code-large"
-      />
-      <button class="close-modal" (click)="closeQrModal()">×</button>
     </div>
   </div>
 </ion-content>

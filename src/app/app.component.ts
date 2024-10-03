@@ -1,6 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { trigger, style, animate, transition } from '@angular/animations';
+import {
+  trigger,
+  style,
+  animate,
+  transition,
+  query,
+  group,
+  AnimationEvent,
+} from '@angular/animations';
 
 interface TableData {
   heading: string;
@@ -59,22 +67,71 @@ interface PinballMap {
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(100%)' }),
-        animate(
-          '1s ease-in',
-          style({ opacity: 1, transform: 'translateY(0)' })
-        )
+    trigger('slideAnimation', [
+      transition('* => next', [
+        query(
+          ':enter, :leave',
+          style({ position: 'absolute', width: '100%' }),
+          { optional: true }
+        ),
+        group([
+          query(
+            ':enter',
+            [
+              style({ transform: 'translateX(100%)' }),
+              animate(
+                '300ms ease-in-out',
+                style({ transform: 'translateX(0%)' })
+              ),
+            ],
+            { optional: true }
+          ),
+          query(
+            ':leave',
+            [
+              style({ transform: 'translateX(0%)' }),
+              animate(
+                '300ms ease-in-out',
+                style({ transform: 'translateX(-100%)' })
+              ),
+            ],
+            { optional: true }
+          ),
+        ]),
       ]),
-      transition(':leave', [
-        animate(
-          '1s ease-out',
-          style({ opacity: 0, transform: 'translateY(-100%)' })
-        )
-      ])
-    ])
-  ]
+      transition('* => prev', [
+        query(
+          ':enter, :leave',
+          style({ position: 'absolute', width: '100%' }),
+          { optional: true }
+        ),
+        group([
+          query(
+            ':enter',
+            [
+              style({ transform: 'translateX(-100%)' }),
+              animate(
+                '300ms ease-in-out',
+                style({ transform: 'translateX(0%)' })
+              ),
+            ],
+            { optional: true }
+          ),
+          query(
+            ':leave',
+            [
+              style({ transform: 'translateX(0%)' }),
+              animate(
+                '300ms ease-in-out',
+                style({ transform: 'translateX(100%)' })
+              ),
+            ],
+            { optional: true }
+          ),
+        ]),
+      ]),
+    ]),
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   weatherData: string = 'Loading weather...';
@@ -107,6 +164,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }[] = [];
   progressData: { [key: string]: string } = {};
   hasStandings: boolean = false;
+  animationState: string = ''; // Added for animation
 
   constructor(private http: HttpClient) {}
 
@@ -168,9 +226,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   fetchLatestScores() {
     this.http
-      .get<LatestScore[]>(
-        'https://backend.aixplay.aixtraball.de/latestscores'
-      )
+      .get<LatestScore[]>('https://backend.aixplay.aixtraball.de/latestscores')
       .subscribe(
         (scores) => {
           if (scores) {
@@ -186,9 +242,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   fetchHighScores() {
     this.http
-      .get<HighScore[]>(
-        'https://backend.aixplay.aixtraball.de/total_highscore'
-      )
+      .get<HighScore[]>('https://backend.aixplay.aixtraball.de/total_highscore')
       .subscribe(
         (highScores) => {
           if (highScores) {
@@ -303,7 +357,10 @@ export class AppComponent implements OnInit, OnDestroy {
             // If scores are empty, do not add to standings
           },
           (error) => {
-            console.error(`Failed to fetch standings for ${pinballName}`, error);
+            console.error(
+              `Failed to fetch standings for ${pinballName}`,
+              error
+            );
           }
         );
     });
@@ -417,6 +474,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   startTableRotation() {
     this.tableRotationInterval = setInterval(() => {
+      this.animationState = 'next';
       this.showNextTable();
     }, 10000);
   }
@@ -425,6 +483,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isSearching) {
       return;
     }
+    this.animationState = 'prev';
     this.currentTableIndex =
       (this.currentTableIndex - 1 + this.filteredTables.length) %
       this.filteredTables.length;
@@ -434,8 +493,13 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isSearching) {
       return;
     }
+    this.animationState = 'next';
     this.currentTableIndex =
       (this.currentTableIndex + 1) % this.filteredTables.length;
+  }
+
+  onAnimationDone(event: AnimationEvent) {
+    this.animationState = '';
   }
 
   onSearch(event: any) {

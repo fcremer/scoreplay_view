@@ -43,6 +43,12 @@ interface HighScore {
   total_points: number;
 }
 
+interface EfficiencyScore {
+  player: string;
+  rank: number;
+  efficiency: number;
+}
+
 interface Player {
   abbreviation: string;
   name: string;
@@ -165,6 +171,10 @@ export class AppComponent implements OnInit, OnDestroy {
   progressData: { [key: string]: string } = {};
   hasStandings: boolean = false;
   animationState: string = ''; // Added for animation
+  efficiencyScores: EfficiencyScore[] = [];
+  currentSlide: number = 0;
+  slideLabels: string[] = ['Standings', 'Efficiency', 'Latest', 'Match'];
+  slideRotationInterval: any;
 
   constructor(private http: HttpClient) {}
 
@@ -179,11 +189,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.fetchPlayers();
     this.fetchPinballs();
     this.startTableRotation();
+    this.startSlideRotation();
   }
 
   ngOnDestroy() {
     if (this.tableRotationInterval) {
       clearInterval(this.tableRotationInterval);
+    }
+    if (this.slideRotationInterval) {
+      clearInterval(this.slideRotationInterval);
     }
   }
 
@@ -207,6 +221,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .then(() => {
         this.fetchLatestScores();
         this.fetchHighScores();
+        this.fetchEfficiencyScores();
       })
       .then(() => {
         console.log('All data loaded successfully');
@@ -256,6 +271,24 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         (error) => {
           console.error('Failed to fetch high scores', error);
+        }
+      );
+  }
+
+  fetchEfficiencyScores() {
+    this.http
+      .get<EfficiencyScore[]>(
+        'https://backend.aixplay.aixtraball.de/efficiency_highscore'
+      )
+      .subscribe(
+        (scores) => {
+          if (scores) {
+            this.efficiencyScores = scores.sort((a, b) => a.rank - b.rank);
+            console.log('Efficiency scores loaded:', this.efficiencyScores);
+          }
+        },
+        (error) => {
+          console.error('Failed to fetch efficiency scores', error);
         }
       );
   }
@@ -515,5 +548,19 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.filteredTables.length > 0) {
       this.currentTableIndex = 0;
     }
+  }
+
+  goToSlide(index: number) {
+    this.currentSlide = index;
+    if (this.slideRotationInterval) {
+      clearInterval(this.slideRotationInterval);
+    }
+    this.startSlideRotation();
+  }
+
+  startSlideRotation() {
+    this.slideRotationInterval = setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % this.slideLabels.length;
+    }, 10000);
   }
 }

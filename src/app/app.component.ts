@@ -1,5 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { IonSlides } from '@ionic/angular';
 import {
   trigger,
   style,
@@ -41,6 +48,12 @@ interface HighScore {
   player: string;
   rank: number;
   total_points: number;
+}
+
+interface EfficiencyScore {
+  player: string;
+  rank: number;
+  efficiency: number;
 }
 
 interface Player {
@@ -133,7 +146,7 @@ interface PinballMap {
     ]),
   ],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
@@ -165,6 +178,11 @@ export class AppComponent implements OnInit, OnDestroy {
   progressData: { [key: string]: string } = {};
   hasStandings: boolean = false;
   animationState: string = ''; // Added for animation
+  efficiencyScores: EfficiencyScore[] = [];
+  activeTab: string = 'standings';
+  tabOrder: string[] = ['standings', 'season', 'latest', 'efficiency', 'match'];
+  slideOpts = { autoplay: { delay: 10000 }, loop: true };
+  @ViewChild('mainSlides', { static: false }) slides?: IonSlides;
 
   constructor(private http: HttpClient) {}
 
@@ -179,6 +197,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.fetchPlayers();
     this.fetchPinballs();
     this.startTableRotation();
+  }
+
+  ngAfterViewInit() {
+    this.slides?.startAutoplay();
   }
 
   ngOnDestroy() {
@@ -207,6 +229,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .then(() => {
         this.fetchLatestScores();
         this.fetchHighScores();
+        this.fetchEfficiencyScores();
       })
       .then(() => {
         console.log('All data loaded successfully');
@@ -256,6 +279,24 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         (error) => {
           console.error('Failed to fetch high scores', error);
+        }
+      );
+  }
+
+  fetchEfficiencyScores() {
+    this.http
+      .get<EfficiencyScore[]>(
+        'https://backend.aixplay.aixtraball.de/efficiency_highscore'
+      )
+      .subscribe(
+        (scores) => {
+          if (scores) {
+            this.efficiencyScores = scores.sort((a, b) => a.rank - b.rank);
+            console.log('Efficiency scores loaded:', this.efficiencyScores);
+          }
+        },
+        (error) => {
+          console.error('Failed to fetch efficiency scores', error);
         }
       );
   }
@@ -515,5 +556,17 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.filteredTables.length > 0) {
       this.currentTableIndex = 0;
     }
+  }
+
+  segmentChanged() {
+    const index = this.tabOrder.indexOf(this.activeTab);
+    this.slides?.slideTo(index);
+  }
+
+  onSlideChanged() {
+    this.slides?.getActiveIndex().then((idx) => {
+      const realIndex = idx % this.tabOrder.length;
+      this.activeTab = this.tabOrder[realIndex];
+    });
   }
 }

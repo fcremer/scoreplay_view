@@ -43,15 +43,10 @@
     <p>Loading data, please wait...</p>
   </div>
 
-  <ion-slides
-    #mainSlides
-    [options]="slideOpts"
-    (ionSlideDidChange)="onSlideChanged()"
-    *ngIf="!isLoading"
-  >
-    <!-- Standings Slide -->
-    <ion-slide>
-      <div class="widget standings-widget">
+  <div class="tab-content" *ngIf="!isLoading">
+    <ng-container [ngSwitch]="activeTab">
+      <!-- Standings Tab -->
+      <div *ngSwitchCase="'standings'" class="widget standings-widget">
         <h2 class="widget-heading">
           <ion-icon name="trophy-outline"></ion-icon> Standings
         </h2>
@@ -111,11 +106,9 @@
           </ng-template>
         </div>
       </div>
-    </ion-slide>
 
-    <!-- Season Leaderboard Slide -->
-    <ion-slide>
-      <div class="widget">
+      <!-- Season Leaderboard Tab -->
+      <div *ngSwitchCase="'season'" class="widget">
         <h2 class="widget-heading">
           <ion-icon name="calendar-outline"></ion-icon> Season Leaderboard
         </h2>
@@ -140,11 +133,9 @@
           </table>
         </div>
       </div>
-    </ion-slide>
 
-    <!-- Latest Scores Slide -->
-    <ion-slide>
-      <div class="widget">
+      <!-- Latest Scores Tab -->
+      <div *ngSwitchCase="'latest'" class="widget">
         <h2 class="widget-heading">
           <ion-icon name="time-outline"></ion-icon> Latest Scores
         </h2>
@@ -175,11 +166,9 @@
           </table>
         </div>
       </div>
-    </ion-slide>
 
-    <!-- Efficiency Leaderboard Slide -->
-    <ion-slide>
-      <div class="widget">
+      <!-- Efficiency Leaderboard Tab -->
+      <div *ngSwitchCase="'efficiency'" class="widget">
         <h2 class="widget-heading">
           <ion-icon name="flash-outline"></ion-icon> Efficiency
         </h2>
@@ -202,11 +191,9 @@
           </table>
         </div>
       </div>
-    </ion-slide>
 
-    <!-- Match-Suggester Slide -->
-    <ion-slide>
-      <div class="widget match-suggestor-widget">
+      <!-- Match-Suggester Tab -->
+      <div *ngSwitchCase="'match'" class="widget match-suggestor-widget">
         <h2 class="widget-heading">
           <ion-icon name="color-wand-outline"></ion-icon> Match-Suggester
         </h2>
@@ -289,6 +276,6 @@
           </div>
         </div>
       </div>
-    </ion-slide>
-  </ion-slides>
+    </ng-container>
+  </div>
 </ion-content>

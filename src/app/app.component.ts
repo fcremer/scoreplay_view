@@ -1,12 +1,5 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  AfterViewInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IonSlides } from '@ionic/angular';
 import {
   trigger,
   style,
@@ -146,7 +139,7 @@ interface PinballMap {
     ]),
   ],
 })
-export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AppComponent implements OnInit, OnDestroy {
   weatherData: string = 'Loading weather...';
   newsData: string = 'Loading news...';
   stockData: string = 'Loading stocks...';
@@ -181,8 +174,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   efficiencyScores: EfficiencyScore[] = [];
   activeTab: string = 'standings';
   tabOrder: string[] = ['standings', 'season', 'latest', 'efficiency', 'match'];
-  slideOpts = { autoplay: { delay: 10000 }, loop: true };
-  @ViewChild('mainSlides', { static: false }) slides?: IonSlides;
+  tabRotationInterval: any;
 
   constructor(private http: HttpClient) {}
 
@@ -197,15 +189,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.fetchPlayers();
     this.fetchPinballs();
     this.startTableRotation();
-  }
-
-  ngAfterViewInit() {
-    this.slides?.startAutoplay();
+    this.startTabRotation();
   }
 
   ngOnDestroy() {
     if (this.tableRotationInterval) {
       clearInterval(this.tableRotationInterval);
+    }
+    if (this.tabRotationInterval) {
+      clearInterval(this.tabRotationInterval);
     }
   }
 
@@ -559,14 +551,17 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   segmentChanged() {
-    const index = this.tabOrder.indexOf(this.activeTab);
-    this.slides?.slideTo(index);
+    if (this.tabRotationInterval) {
+      clearInterval(this.tabRotationInterval);
+    }
+    this.startTabRotation();
   }
 
-  onSlideChanged() {
-    this.slides?.getActiveIndex().then((idx) => {
-      const realIndex = idx % this.tabOrder.length;
-      this.activeTab = this.tabOrder[realIndex];
-    });
+  startTabRotation() {
+    this.tabRotationInterval = setInterval(() => {
+      const idx = this.tabOrder.indexOf(this.activeTab);
+      const nextIdx = (idx + 1) % this.tabOrder.length;
+      this.activeTab = this.tabOrder[nextIdx];
+    }, 10000);
   }
 }

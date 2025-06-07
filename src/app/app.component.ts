@@ -172,9 +172,9 @@ export class AppComponent implements OnInit, OnDestroy {
   hasStandings: boolean = false;
   animationState: string = ''; // Added for animation
   efficiencyScores: EfficiencyScore[] = [];
-  activeTab: string = 'standings';
-  tabOrder: string[] = ['standings', 'season', 'latest', 'efficiency', 'match'];
-  tabRotationInterval: any;
+  currentSlide: number = 0;
+  slideLabels: string[] = ['Standings', 'Efficiency', 'Latest', 'Match'];
+  slideRotationInterval: any;
 
   constructor(private http: HttpClient) {}
 
@@ -189,15 +189,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.fetchPlayers();
     this.fetchPinballs();
     this.startTableRotation();
-    this.startTabRotation();
+    this.startSlideRotation();
   }
 
   ngOnDestroy() {
     if (this.tableRotationInterval) {
       clearInterval(this.tableRotationInterval);
     }
-    if (this.tabRotationInterval) {
-      clearInterval(this.tabRotationInterval);
+    if (this.slideRotationInterval) {
+      clearInterval(this.slideRotationInterval);
     }
   }
 
@@ -550,18 +550,17 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  segmentChanged() {
-    if (this.tabRotationInterval) {
-      clearInterval(this.tabRotationInterval);
+  goToSlide(index: number) {
+    this.currentSlide = index;
+    if (this.slideRotationInterval) {
+      clearInterval(this.slideRotationInterval);
     }
-    this.startTabRotation();
+    this.startSlideRotation();
   }
 
-  startTabRotation() {
-    this.tabRotationInterval = setInterval(() => {
-      const idx = this.tabOrder.indexOf(this.activeTab);
-      const nextIdx = (idx + 1) % this.tabOrder.length;
-      this.activeTab = this.tabOrder[nextIdx];
+  startSlideRotation() {
+    this.slideRotationInterval = setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % this.slideLabels.length;
     }, 10000);
   }
 }
